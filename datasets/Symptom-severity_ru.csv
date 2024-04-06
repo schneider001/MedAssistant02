@@ -1,0 +1,133 @@
+itching,1,зуд
+skin_rash,3,кожная сыпь
+nodal_skin_eruptions,4,узловые кожные высыпания
+continuous_sneezing,4,непрерывное чихание
+shivering,5,дрожь
+chills,3,озноб
+joint_pain,3,боль в суставах
+stomach_pain,5,боль в животе
+acidity,3,кислотность
+ulcers_on_tongue,4,язвы на языке
+muscle_wasting,3,атрофия мышц
+vomiting,5,рвота
+burning_micturition,6,жгучее мочеиспускание
+spotting_urination,6,кровянистые выделения при мочеиспускании
+fatigue,4,усталость
+weight_gain,3,увеличение веса
+anxiety,4,тревожность
+cold_hands_and_feets,5,холодные руки и ноги
+mood_swings,3,перепады настроения
+weight_loss,3,потеря веса
+restlessness,5,беспокойство
+lethargy,2,вялость
+patches_in_throat,6,пятна в горле
+irregular_sugar_level,5,нерегулярный уровень сахара
+cough,4,кашель
+high_fever,7,высокая температура
+sunken_eyes,3,запавшие глаза
+breathlessness,4,одышка
+sweating,3,потливость
+dehydration,4,обезвоживание
+indigestion,5,несварение желудка
+headache,3,головная боль
+yellowish_skin,3,желтоватая кожа
+dark_urine,4,темная моча
+nausea,5,тошнота
+loss_of_appetite,4,потеря аппетита
+pain_behind_the_eyes,4,боль за глазами
+back_pain,3,боль в спине
+constipation,4,запор
+abdominal_pain,4,боль районе живота
+diarrhoea,6,диарея
+mild_fever,5,слабая лихорадка
+yellow_urine,4,желтая моча
+yellowing_of_eyes,4,пожелтение глаз
+acute_liver_failure,6,острая печеночная недостаточность
+fluid_overload,6,перегрузка жидкостью
+swelling_of_stomach,7,вздутие желудка
+swelled_lymph_nodes,6,опухшие лимфатические узлы
+malaise,6,недомогание
+blurred_and_distorted_vision,5,затуманенное и искаженное зрение
+phlegm,5,мокрота
+throat_irritation,4,раздражение горла
+redness_of_eyes,5,покраснение глаз
+sinus_pressure,4,давление пазухи
+runny_nose,5,насморк
+congestion,5,заложенный нос
+chest_pain,7,боль в груди
+weakness_in_limbs,7,слабость в конечностях
+fast_heart_rate,5,быстрый сердечный ритм
+pain_during_bowel_movements,5,боль во время дефекации
+pain_in_anal_region,6,боль в анальной области
+bloody_stool,5,кровавый стул
+irritation_in_anus,6,раздражение в анусе
+neck_pain,5,боль в шее
+dizziness,4,головокружение
+cramps,4,судороги
+bruising,4,синяки
+obesity,4,ожирение
+swollen_legs,5,опухшие ноги
+swollen_blood_vessels,5,опухшие кровеносные сосуды
+puffy_face_and_eyes,5,опухшее лицо и глаза
+enlarged_thyroid,6,увеличенная щитовидная железа
+brittle_nails,5,ломкие ногти
+swollen_extremeties,5,опухшие крайности
+excessive_hunger,4,чрезмерный голод
+extra_marital_contacts,5,внебрачные контакты
+drying_and_tingling_lips,4,сохнут и покалывают губы
+slurred_speech,4,невнятная речь
+knee_pain,3,боль в колене
+hip_joint_pain,2,боль в тазобедренном суставе
+muscle_weakness,2,мышечная слабость
+stiff_neck,4,скованность мышц шеи
+swelling_joints,5,опухшие суставы
+movement_stiffness,5,скованность движений
+spinning_movements,6,вращательные движения
+loss_of_balance,4,потеря равновесия
+unsteadiness,4,неустойчивость
+weakness_of_one_body_side,4,слабость одной стороны тела
+loss_of_smell,3,потеря обоняния
+bladder_discomfort,4,дискомфорт в мочевом пузыре
+foul_smell_ofurine,5,неприятный запах мочи
+continuous_feel_of_urine,6,постоянное ощущение мочи
+passage_of_gases,5,прохождение газов
+internal_itching,4,внутренний зуд
+toxic_look_(typhos),5,токсичный вид (тиф)
+depression,3,депрессия
+irritability,2,раздражительность
+muscle_pain,2,боли в мышцах
+altered_sensorium,2,измененная сенсорика
+red_spots_over_body,3,красные пятна по телу
+belly_pain,4,боль около живота 
+abnormal_menstruation,6,аномальная менструация
+dischromic_patches,6,дисхромные пятна
+watering_from_eyes,4,слезоточивость из глаз
+increased_appetite,5,повышенный аппетит
+polyuria,4,полиурия
+family_history,5,история семьи
+mucoid_sputum,4,слизистая мокрота
+rusty_sputum,4,ржавая мокрота
+lack_of_concentration,3,нехватка концентрации
+visual_disturbances,3,нарушения зрения
+receiving_blood_transfusion,5,получение переливания крови
+receiving_unsterile_injections,2,получение нестерильных инъекций
+coma,7,кома
+stomach_bleeding,6,желудочное кровотечение
+distention_of_abdomen,4,вздутие живота
+history_of_alcohol_consumption,5,история употребления алкоголя
+fluid_overload,4,перегрузка жидкостью
+blood_in_sputum,5,кровь в мокроте
+prominent_veins_on_calf,6,выступающие вены на икре
+palpitations,4,сердцебиение
+painful_walking,2,болезненная ходьба
+pus_filled_pimples,2,"прыщи, наполненные гноем"
+blackheads,2,угри
+scurring,2,рубцы
+skin_peeling,3,шелушение кожи
+silver_like_dusting,2,серебристые пятна (как пыль)
+small_dents_in_nails,2,небольшие вмятины на ногтях
+inflammatory_nails,2,воспаленные ногти
+blister,4,волдырь
+red_sore_around_nose,2,красная болячка вокруг носа
+yellow_crust_ooze,3,желтая корка слизь
+prognosis,5,прогноз
