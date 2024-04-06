@@ -1,11 +1,19 @@
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.hashers import make_password, check_password
 
 
-class Doctor(models.Model):
+class Doctor(AbstractBaseUser):
     username = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255, null=True)
-    password_hash = models.BinaryField()
-    last_login = models.DateTimeField(null=True)
+
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
+
+    def check_password(self, raw_password):
+        return check_password(raw_password, self.password_hash)
+    
+    USERNAME_FIELD = 'username'
 
 
 class Patient(models.Model):
@@ -24,10 +32,17 @@ class Patient(models.Model):
     sex = models.CharField(max_length=10, choices=SEX_CHOICES)
 
 
-class Administrator(models.Model):
+class Administrator(AbstractBaseUser):
     username = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255, null=True)
-    password_hash = models.BinaryField()
+
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
+
+    def check_password(self, raw_password):
+        return check_password(raw_password, self.password_hash)
+    
+    USERNAME_FIELD = 'username'
 
 
 class Symptom(models.Model):
