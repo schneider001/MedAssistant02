@@ -1,19 +1,21 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
-class Doctor(AbstractBaseUser):
-    username = models.CharField(max_length=255, unique=True)
+class Doctor(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, null=True)
 
-    def set_password(self, raw_password):
-        self.password = make_password(raw_password)
-
-    def check_password(self, raw_password):
-        return check_password(raw_password, self.password_hash)
+    @receiver(post_save, sender=User)
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            Doctor.objects.create(user=instance)
     
-    USERNAME_FIELD = 'username'
+    @receiver(post_save, sender=User)
+    def save_user_profile(sender, instance, **kwargs):
+        instance.doctor.save()
 
 
 class Patient(models.Model):
@@ -30,19 +32,6 @@ class Patient(models.Model):
     insurance_certificate = models.CharField(max_length=255, unique=True)
     born_date = models.DateTimeField(null=True)
     sex = models.CharField(max_length=10, choices=SEX_CHOICES)
-
-
-class Administrator(AbstractBaseUser):
-    username = models.CharField(max_length=255, unique=True)
-    name = models.CharField(max_length=255, null=True)
-
-    def set_password(self, raw_password):
-        self.password = make_password(raw_password)
-
-    def check_password(self, raw_password):
-        return check_password(raw_password, self.password_hash)
-    
-    USERNAME_FIELD = 'username'
 
 
 class Symptom(models.Model):

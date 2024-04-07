@@ -14,7 +14,8 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'medassistant.settings')
 
 django.setup()
 
-from app_medassistant.models import Doctor, Administrator, Patient, Request, Symptom, Disease, Comment, RequestSymptom
+from app_medassistant.models import Doctor, Patient, Request, Symptom, Disease, Comment, RequestSymptom
+from django.contrib.auth.models import User
 
 def fill_from_dataset(filepath, model_class):
     with open(filepath, 'r', encoding='utf-8') as csv_file:
@@ -56,19 +57,10 @@ def populate_database():
         ("doctor5", "Михайлов Михаил Михайлович", '5')
     ]
     for username, name, password in doctors:
-        doctor = Doctor.objects.create(username=username, name=name)
-        doctor.set_password(password)
-        doctor.save()
-
-    # Создание администраторов
-    admins = [
-        ("admin1", "Владимиров Владимир Владимирович", '123'),
-        ("admin2", "Егоров Erop Егорович", '321')
-    ]
-    for username, name, password in admins:
-        admin = Administrator.objects.create(username=username, name=name)
-        admin.set_password(password)
-        admin.save()
+        user = User.objects.create(username=username)
+        user.set_password(password)
+        user.doctor.name = name
+        user.save()
 
     # Создание запросов
     for i in range(200):
