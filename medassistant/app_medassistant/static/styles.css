@@ -1,0 +1,458 @@
+@import url('https://fonts.googleapis.com/css?family=Nunito:300,400,400i,500');
+
+:root {
+  --primary-color: #006D77;
+  --secondary-color: #D3EAEB;
+  --background-color: #EDF6F9;
+  --text-color-dark: #002529;
+  --text-color-primary: #004950;
+  --text-color-primary-light: #0FBBE6 ;
+  --text-color-light: #EDF6F9;
+  --selection-hover: #FBECE7;
+  --selection-selected: #FFDDD2;
+}
+
+/* ScrollBar Style */
+
+*,
+html *
+{
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--secondary-color);
+}
+
+*::-webkit-scrollbar,
+html *::-webkit-scrollbar {
+  height: 12px;
+  width: 12px;
+}
+*::-webkit-scrollbar-track,
+html *::-webkit-scrollbar-track {
+  background: var(--secondary-color);
+  border-radius: 7px;
+}
+*::-webkit-scrollbar-thumb,
+html *::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border: 3px solid var(--secondary-color); 
+  border-radius: 7px;
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--secondary-color);
+  border-radius: 7px;
+}
+
+body {
+  background: var(--text-color-light);
+  overflow-x: hidden;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+}
+.account-block {
+  padding: 0;
+  background-image: url('/static/loginBackground.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 100%;
+  position: relative;
+}
+.account-block .overlay {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.account-block .account-testimonial {
+  text-align: center;
+  color: var(--text-color-light);
+  position: absolute;
+  margin: 0 auto;
+  padding: 0 1.75rem;
+  bottom: 3rem;
+  left: 0;
+  right: 0;
+}
+
+.text-primary {
+  color: var(--text-color-primary-light) !important;
+}
+
+.link-grey {
+  color: var(--primary-color) !important;
+  font-weight: bold;
+}
+
+.text-theme {
+  color: var(--primary-color) !important;
+}
+
+.btn-theme {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--text-color-light);
+  font-weight: bold;
+}
+
+.select2-container--bootstrap-5 .select2-selection {
+  border-color: var(--primary-color);
+}
+
+.form-control {
+  border-color: var(--primary-color) !important;
+}
+
+.btn-theme:hover {
+  border-color: var(--text-color-dark);
+}
+
+.input-theme {
+  background-color: white;
+  border-color: var(--secondary-color);
+  color: var(--text-color-dark);
+}
+
+/* Toggle Styles */
+
+#viewport {
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+  background-image: url("/static/background.jpg");
+  background-repeat: repeat;
+  background-size: 650px;
+}
+
+#centered-box {
+  background-color: var(--background-color);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.centered-box-header {
+  padding: 8px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  background-color: var(--primary-color);
+  color: var(--text-color-light);
+}
+
+.centered-box-body {
+  padding: 20px;
+}
+
+#patients-table tbody tr:hover, #request-history-table tbody tr:hover {
+  cursor: pointer;
+}
+
+.table-responsive {
+  border-radius: 7px;
+}
+
+.table-scrollable { 
+  margin: 0; 
+  padding: 0;
+}
+
+.fade-in {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.patient-photo {
+  width: 100%;
+  height: 100%;
+}
+
+.info-item {
+  margin-bottom: 15px;
+}
+
+.info-label {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.select2-container {
+  width: 100% !important;
+}
+    
+.select2-results__option[aria-selected=true]:not(.select2-results__option--selected) {
+  background-color: var(--selection-hover) !important;
+  color: var(--text-color-dark) !important;
+}
+
+.select2-results__option--selected {
+  background-color: var(--selection-selected) !important;
+  color: var(--text-color-dark) !important;
+}
+
+.select2-container--bootstrap-5 .select2-search.select2-search--inline {
+  cursor: text;
+}
+
+.select2-container .select2-selection--multiple {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.select2-container .select2-search {
+  display: inline-block;
+  flex: 1;
+}
+
+.modal-header {
+  background-color: var(--primary-color);
+  color: var(--text-color-light);
+}
+
+.load-section {
+  position: relative;
+  height: 66vh;
+}
+
+.spinner-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.comments-block-card {
+  background-color: var(--secondary-color);
+  border-radius: 7px;
+  overflow-y: auto;
+  height: 50vh;
+}
+
+.comment-card, .add-comment-card, .login-card {
+  background-color: var(--background-color);
+}
+
+
+/* Sidebar Styles */
+
+#sidebar {
+  overflow-y: auto;
+  background: var(--background-color);
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
+#sidebar header {
+  background-color: var(--primary-color);
+  border-right: 2px solid var(--primary-color);
+  font-weight: bold;
+  text-align: center;
+}
+
+#sidebar header a {
+  color: var(--text-color-light);
+  display: block;
+  text-decoration: none;
+}
+
+#sidebar .nav {
+  width: 100%;
+  padding: 10px;
+}
+
+#sidebar .nav-item {
+  width: 100%;
+}
+
+#sidebar .nav-link {
+  width: 100%;
+}
+
+#sidebar .nav a {
+  background: none;
+  border-radius: 10px;
+  color: var(--text-color-dark);
+  font-size: 19px;
+}
+
+#sidebar .nav a:hover {
+  background: var(--secondary-color);
+  color: var(--text-color-primary);
+}
+
+#sidebar .nav a.active {
+  background: var(--secondary-color);
+  position: relative;
+}
+
+#sidebar .nav a.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  margin-left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  bottom: 0;
+  height: 66%;
+  width: 3px;
+  background-color: var(--primary-color);
+}
+
+.add-patient-button {
+  display: block;
+  text-align: center;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 5px; 
+  margin-left: 11px; 
+  margin-right: 11px
+}
+
+.oms-input {
+  display: inline-flex;
+  align-items: left;
+}
+
+.oms-part {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 3em;
+  text-align: left;
+  margin: 0;
+  padding: 0;
+}
+
+.vh-35 {
+  height: 35vh;
+  max-height: 35vh;
+}
+
+.vh-66 {
+  height: 66vh;
+  max-height: 66vh;
+}
+
+.tableFixHead {
+  overflow: auto;
+  width: 100%; 
+  border-radius: 7px;
+  background-color: var(--secondary-color);
+  border: 1px solid var(--primary-color);
+}
+
+.tableFixHead thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--secondary-color);
+}
+
+.tableFixHead tbody th {
+  position: sticky;
+  left: 0;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  padding: 8px 16px;
+  white-space: nowrap;
+}
+
+.table-striped>tbody>tr:nth-child(odd)>td, 
+.table-striped>tbody>tr:nth-child(odd)>th {
+   background-color: var(--selection-selected);
+}
+
+ .table-striped>tbody>tr:nth-child(even)>td, 
+ .table-striped>tbody>tr:nth-child(even)>th {
+    background-color: var(--selection-hover);
+}
+
+
+#image-upload-container {
+  width: 100%;
+  height: 300px;
+}
+
+#image-upload {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  border: 2px dashed var(--primary-color);
+  border-radius: 7px;
+  background-color: var(--background-color);
+  cursor: pointer;
+}
+
+#image-upload:hover {
+  background-color: var(--secondary-color);
+}
+
+#thumbnail-container {
+  display: none;
+}
+
+#thumbnail {
+  margin: 0 auto;
+  border-radius: 25px;
+  border: solid 1px var(--primary-color);
+  background-color: white;
+}
+
+.img-wrapper {
+  position: relative;
+  text-align: center;
+}
+
+.img-responsive {
+  width: 100%;
+  height: auto;
+}
+
+.img-overlay {
+  position: absolute;
+  top: 0;
+  right: 50%;
+  transform: translate(96px, 32px);
+}
+
+.img-overlay:before {
+  content: ' ';
+  display: block;
+  height: 50%;
+}
+
+#delete-icon {
+  cursor: pointer;
+  border-radius: 25px;
+}
+
+#delete-icon:hover {
+  opacity: 0.75;
+}
+
+#request-history-table table th:nth-child(1):not(#loading):not(#notfound),
+#request-history-table table td:nth-child(1):not(#loading):not(#notfound),
+#patients-table table th:nth-child(1):not(#loading):not(#notfound), 
+#patients-table table td:nth-child(1):not(#loading):not(#notfound) {
+  display: none;
+}
+
+.search-input:valid {
+  color: black;
+}
+
+.search-input:invalid {
+  color: lightgray;
+}
