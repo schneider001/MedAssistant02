@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Login Page{% endblock %}
+
+{% block content %}
+<div id="viewport">
+    <div class="vh-100 d-flex justify-content-center align-items-center align-self-center">
+        <div class="container-lg container-md container-sm col-xxl-6 col-xl-8 col-lg-10 col-md-11 px-0">
+            <div class="col-xl-11">
+                <div class="card border-0 login-card shadow-lg">
+                    <div class="card-body p-0">
+                        <div class="row no-gutters">
+                            <div class="col-lg-6">
+                                <div class="p-5">
+                                    <div class="mb-5">
+                                        <h3 class="h4 font-weight-bold text-theme">Вход</h3>
+                                    </div>
+                                    <h6 class="h5 mb-0">Добро пожаловать!</h6>
+                                    <p class="text-muted mt-2 mb-5">Введите ваш логин и пароль для доступа к системе.</p>
+                                    <form method="POST" id="loginForm">
+                                        {% csrf_token %}
+                                        <div class="mb-3">
+                                            <label for="username" class="form-label">Имя пользователя</label>
+                                            <input type="text" class="form-control" id="username" name="username" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="password" class="form-label">Пароль</label>
+                                            <input type="password" class="form-control" id="password" name="password" required>
+                                        </div>
+                                        <div id="errorMessagePlaceholder" style="height: 52px;"></div>
+                                        <div id="errorMessage" class="alert alert-danger mt-3" role="alert" style="display: none; padding: 5px; padding-left: 10px;"></div>
+                                        <button type="submit" class="btn btn-theme">Войти</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 d-none d-lg-inline-block">
+                                <div class="account-block rounded-end">
+                                    <div class="overlay rounded-end"></div>
+                                    <div class="account-testimonial">
+                                        <h4 class="text-white mb-4">Мед Ассистент</h4>
+                                        <p class="lead text-white">Предсказание болезней по заданным симптомам</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/loginPage.js' %}" type="module"></script>
+{% endblock %}

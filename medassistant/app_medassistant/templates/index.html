@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block content %}
+<div id="viewport">
+  <!-- Content -->
+  <div class="vh-100 d-flex justify-content-center align-items-center align-self-center">
+    <div id="centered-box" class="container-lg container-md container-sm col-xxl-6 col-xl-8 col-lg-10 col-md-11 px-0" style="min-height: 35vh;">
+      <div class="centered-box-header">
+        <h1 class="text-center">Запрос</h1>
+      </div>
+      <div class="centered-box-body">
+        <form method="POST" id="requestForm">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="patientname" class="form-label">Пациент</label>
+            <select id="patientname" name="patientname" class="form-control" data-placeholder="Выберите пациента" required>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="symptoms" class="form-label">Симптомы</label>
+            <select class="form-control d-none" id="symptoms" data-placeholder="Выберите что-нибудь" multiple required>
+            </select>
+          </div>
+          <div class="text-end">
+            <button type="submit" class="btn btn-theme" data-toggle="modal" data-target="#requestModal">Отправить</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include "requestModal.html" %}
+{% include "createPatientModal.html" %}
+
+<script src="{% static 'js/requestPage.js' %}" type="module"></script>
+{% endblock %}

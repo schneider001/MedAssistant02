@@ -1,0 +1,74 @@
+{% load static %}
+
+<div class="modal fade" id="createPatientModal" tabindex="-1" data-modal-id="createpatient" aria-labelledby="createPatientModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form id="create-patient-form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createPatientModalLabel">Создание пациента</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="fullname" class="form-label">ФИО пациента</label>
+                        <input type="text" name="fullname" class="form-control" id="fullname" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="birthdate" class="form-label">Дата рождения</label>
+                        <input type="text" name="birthdate" class="form-control" id="birthdate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="oms" class="form-label">Полис ОМС</label>
+                        <div class="oms-input form-control">
+                            <input type="text" id="oms1" class="oms-part" maxlength="4" pattern="\d{4}" placeholder="0123" required>
+                            <span class="oms-separator"> </span>
+                            <input type="text" id="oms2" class="oms-part" maxlength="4" pattern="\d{4}" placeholder="4567" required>
+                            <span class="oms-separator"> </span>
+                            <input type="text" id="oms3" class="oms-part" maxlength="4" pattern="\d{4}" placeholder="8910" required>
+                            <span class="oms-separator"> </span>
+                            <input type="text" id="oms4" class="oms-part" maxlength="4" pattern="\d{4}" placeholder="1112" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sex" class="form-label">Пол</label>
+                        <select name="sex" class="form-control" id="sex" data-placeholder="Выберите пол" required>
+                            <option></option>
+                            <option value="MALE">Мужской</option>
+                            <option value="FEMALE">Женский</option>
+                            <option value="ANOTHER">Другой</option>
+                        </select>
+                    </div>
+                    <div class="mb-5">
+                        <label class="form-label" for="image-upload-container">Фотография пациента</label>
+                        <div id="image-upload-container" class="text-center d-flex flex-column align-items-center justify-content-center align-self-center">
+                            <label for="file-input" id="image-upload" class="position-relative"
+                                    ondragover="handleDragOver(event)" 
+                                    ondragenter="handleDragEnter(event)" 
+                                    ondragleave="handleDragLeave(event)" 
+                                    ondrop="handleDrop(event)">
+                                <div id="image-upload-block">
+                                    <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleFileSelect(event)" onclick="handleFileClick(event)">
+                                    <i class="zmdi zmdi-cloud-upload" style="font-size: 32px"></i>
+                                    <p>Выберете файл или перетащите его сюда</p>
+                                </div>
+                                <div id="thumbnail-container" class="img-wrapper">
+                                    <div class="img-overlay">
+                                        <i class="zmdi zmdi-delete" id="delete-icon" style="font-size: 32px;"></i>
+                                    </div>
+                                    <img id="thumbnail" src="#" class="img-responsive" alt="Thumbnail" style="width: 256px; height: 256px;">
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-theme">Создать</button>
+                    <button type="button" class="btn" data-bs-dismiss="modal">Отменить</button>
+                </div>
+            </form> 
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/createPatientModal.js' %}" type="module"></script>

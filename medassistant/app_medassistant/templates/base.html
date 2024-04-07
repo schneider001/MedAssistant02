@@ -1,0 +1,78 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css">
+  <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+  {% if show_sidebar %}
+  <!-- Sidebar -->
+  <div class="container-fluid px-0">
+    <div class="row flex-nowrap">
+      <div class="col-auto px-0">
+        <div class="d-flex flex-column min-vh-100" id="sidebar">
+          <header class="py-2 mb-2 d-flex justify-content-center align-items-center">
+            <a class="fs-3 d-none d-md-inline">Мед Ассистент</a>
+          </header>
+          <ul class="nav flex-column">
+            <li class="nav-item ps-3 pb-2">
+              <a href="{% url 'main' %}" class="nav-link {% if request.path == '/main' %}active{% endif %}">
+                <i class="zmdi zmdi-view-dashboard me-1"></i> <span class="ms-1 d-none d-md-inline">Главная</span>
+              </a>
+            </li>
+            <li class="nav-item ps-3 pb-2">
+              <a href="{% url 'patients' %}" class="nav-link {% if request.path == '/patients' %}active{% endif %}">
+                <i class="zmdi zmdi-account me-1"></i> <span class="ms-1 d-none d-md-inline">Пациенты</span>
+              </a>
+            </li>
+            <li class="nav-item ps-3 pb-2">
+              <a href="{% url 'history' %}" class="nav-link {% if request.path == '/history' %}active{% endif %}">
+                <i class="zmdi zmdi-calendar me-1"></i> <span class="ms-1 d-none d-md-inline">История запросов</span>
+              </a>
+            </li>
+          </ul>
+          <ul class="nav flex-column mt-auto">
+            <li class="nav-item ps-3 pb-2 mt-auto">
+              <a href="{% url 'logout' %}" class="nav-link">
+                <i class="zmdi zmdi-sign-in me-1"></i> <span class="ms-1 d-none d-md-inline">Выход</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="col px-0">
+        {% endif %}
+        {% block content %}
+        {% endblock %}
+        {% if show_sidebar %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="error-alert" class="toast bg-danger text-light" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Ошибка</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Закрыть"></button>
+      </div>
+      <div class="toast-body fw-bold" id="error-message">
+      </div>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+  <script src="{% static 'js/main.js' %}" type="module"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.full.min.js" integrity="sha384-XK+RNWGMTrzmgW2CdtRbo2PqZHhp7RgVc/jV/D7ni+nwdjRySR8hjTizxoqhHOf8" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js" integrity="sha384-duAtk5RV7s42V6Zuw+tRBFcqD8RjRKw6RFnxmxIj1lUGAQJyum/vtcUQX8lqKQjp" crossorigin="anonymous"></script>
+</body>
+</html>
