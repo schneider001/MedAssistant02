@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from .models import Patient
 
 
 def login_view(request):
@@ -21,6 +22,7 @@ def login_view(request):
     else:
         return render(request, 'login.html')
 
+
 @login_required
 def logout_view(request):
     """
@@ -28,6 +30,7 @@ def logout_view(request):
     """
     logout(request)
     return redirect('login')
+
 
 @login_required
 def main(request):
@@ -37,6 +40,7 @@ def main(request):
     show_sidebar = True
     return render(request, 'index.html', {'show_sidebar': show_sidebar})
 
+
 @login_required
 def patients(request):
     """
@@ -44,6 +48,21 @@ def patients(request):
     """
     show_sidebar = True
     return render(request, 'patients.html', {'show_sidebar': show_sidebar})
+
+
+@login_required
+def load_patients(request):
+    search = request.GET.get('search', '')
+    per_page = 100
+
+    if len(search) > 3:
+        patients = Patient.find_by_name_and_certificate(search, per_page)
+    else:
+        patients = Patient.find_all(per_page)
+
+    patients_data = [{'id': patient.id, 'name': patient.name, 'oms': patient.insurance_certificate} for patient in patients]
+    return JsonResponse({'results': patients_data, 'pagination': {'more': False}}) #Убрать more
+
 
 @login_required
 def history(request):

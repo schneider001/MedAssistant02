@@ -33,6 +33,26 @@ class Patient(models.Model):
     born_date = models.DateTimeField(null=True)
     sex = models.CharField(max_length=10, choices=SEX_CHOICES)
 
+    @classmethod
+    def find_all(cls, per_page):
+        return cls.objects.order_by('name')[:per_page]
+
+    @classmethod
+    def find_by_name_and_certificate(cls, search, per_page):
+        return cls.objects.filter(
+            models.Q(name__icontains=search) |
+            models.Q(insurance_certificate__icontains=search)
+        ).order_by('-name')[:per_page]
+
+    @classmethod
+    def get_id_by_insurance_certificate(cls, insurance_certificate):
+        patient = cls.objects.filter(insurance_certificate=insurance_certificate).first()
+        return patient.id if patient else None
+
+    @classmethod
+    def get_name_by_request_id(cls, request_id):
+        return cls.objects.filter(patient__request__id=request_id).values_list('name', flat=True).first()
+
 
 class Symptom(models.Model):
     name = models.CharField(max_length=255, unique=True)
