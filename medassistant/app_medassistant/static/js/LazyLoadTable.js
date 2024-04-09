@@ -177,10 +177,7 @@ function convertRequestsToTableRow(request) {
 
     $row.append($('<td>').text(request.id));
     $row.append($('<td>').text(request.name));
-    console.info(request.date);
-    const dateObject = new Date(request.date * 1000);
-    const formattedDate = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, '0')}-${dateObject.getDate().toString().padStart(2, '0')} ${dateObject.getHours().toString().padStart(2, '0')}:${dateObject.getMinutes().toString().padStart(2, '0')}:${dateObject.getSeconds().toString().padStart(2, '0')}`;
-    $row.append($('<td>').text(formattedDate));    
+    $row.append($('<td>').text(request.date));    
     $row.append($('<td>').text(request.diagnosis));    
     $row.append($('<td>').text(request.is_commented ? "Прокомментирован" : "Без комментариев"));
 

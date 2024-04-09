@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.db.models import F
 
 
 class Doctor(models.Model):
@@ -88,6 +89,41 @@ class Request(models.Model):
     predicted_disease = models.ForeignKey(Disease, null=True, on_delete=models.CASCADE)
     ml_model = models.ForeignKey(MLModel, null=True, on_delete=models.CASCADE)
 
+    @classmethod
+    def get_requests_page_by_patient_id(cls, patient_id, per_page):
+        return Request.objects.filter(patient_id=patient_id).annotate(
+            doctor_name=F('doctor__name'),
+            disease_ru_name=F('predicted_disease__ru_name')
+        ).values('id', 'doctor_name', 'date', 'disease_ru_name', 'is_commented')[:per_page]
+    
+    @classmethod
+    def get_requests_page_by_doctor_id_contain_substr(cls, doctor_id, search, per_page):
+        return cls.objects.filter(
+            doctor_id=doctor_id
+        ).annotate(
+            disease_name=F('predicted_disease__ru_name'),
+            patient_name=F('patient__name'),
+        ).filter(
+            models.Q(disease_name__icontains=search) | models.Q(patient_name__icontains=search)
+        ).values(
+            'id', 'patient_name', 'date', 'disease_name', 'is_commented'
+        ).order_by(
+            '-disease_name', 'patient_name', '-date'
+        )[:per_page]
+    
+    @classmethod
+    def get_requests_page_by_doctor_id(cls, doctor_id, per_page):
+        return cls.objects.filter(
+            doctor_id=doctor_id
+        ).annotate(
+            patient_name=F('patient__name'),
+            disease_name=F('predicted_disease__ru_name')
+        ).values(
+            'id', 'patient_name', 'date', 'disease_name', 'is_commented'
+        ).order_by(
+            '-date', 'patient_name'
+        )[:per_page]
+    
 
 class RequestSymptom(models.Model):
     symptom = models.ForeignKey(Symptom, on_delete=models.CASCADE)
