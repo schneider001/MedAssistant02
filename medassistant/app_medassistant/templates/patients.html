@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Patients Page{% endblock %}
+
+{% block content %}
+<div id="viewport">
+  <!-- Content -->
+  <div class="vh-100 d-flex justify-content-center align-items-center align-self-center">
+    <div id="centered-box" class="container-lg container-md container-sm col-xxl-6 col-xl-8 col-lg-10 col-md-11 px-0">
+      <div class="centered-box-header">
+        <h1 class="text-center">Пациенты</h1>
+      </div>
+      <div class="centered-box-body">
+        <form>
+          <input type="search" class="form-control mb-3 search-input" minlength="4" placeholder="Поиск...">
+          <div class="tableFixHead scrollable vh-66" id="patients-table">
+            <table class="table table-striped table-hover table-scrollable">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Имя</th>
+                  <th scope="col">Полис ОМС</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include "patientModal.html" %}
+{% include "requestModal.html" %}
+
+<script src="{% static 'js/patientsPage.js' %}" type="module"></script>
+{% endblock %}

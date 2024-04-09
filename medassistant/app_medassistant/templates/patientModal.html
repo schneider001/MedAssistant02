@@ -1,0 +1,67 @@
+<div class="modal fade" id="patientModal" tabindex="-1" data-modal-id="patient" aria-labelledby="patientModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="patientModalLabel">Информация о пациенте</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+        </div>
+        <div class="modal-body">
+          <div class="load-section" id="patient-load-section">
+            <div class="spinner-container text-center d-flex justify-content-center align-items-center align-self-center">
+              <div class="spinner-border spinner-border-lg" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+              </div>
+            </div>
+          </div>
+          <div id="patient-data-section">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="info-item">
+                  <span class="info-label">Имя:</span>
+                  <span class="info-value" id="name"></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Дата рождения:</span>
+                  <span class="info-value" id="birth-date"></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Возраст:</span>
+                  <span class="info-value" id="age"></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Полис ОМС:</span>
+                  <span class="info-value" id="oms"></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Пол:</span>
+                  <span class="info-value" id="sex"></span>
+                </div>
+              </div>
+              <div class="col-md-4 text-end">
+                <img src="/static/images/default-avatar.png" alt="Фотография пациента" class="patient-photo">
+              </div>
+            </div>
+            <h2 class="text-center mt-4">История запросов</h2>
+            <div class="tableFixHead scrollable vh-35" id="request-history-table">
+              <table class="table table-striped table-hover table-scrollable">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Имя доктора</th>
+                    <th scope="col">Дата</th>
+                    <th scope="col">Предсказанный диагноз</th>
+                    <th scope="col">Комментарии врачей</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-theme" data-bs-dismiss="modal">Закрыть</button>
+        </div>
+      </div>
+    </div>
+  </div>

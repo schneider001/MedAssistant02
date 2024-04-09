@@ -42,12 +42,14 @@ def patients(request):
     """
     Отображает страницу с пациентами.
     """
-    return render(request, 'patients.html')
+    show_sidebar = True
+    return render(request, 'patients.html', {'show_sidebar': show_sidebar})
 
 @login_required
 def history(request):
     """
     Отображает страницу с историей запросов.
     """
-    return render(request, 'history.html')
+    show_sidebar = True
+    return render(request, 'history.html', {'show_sidebar': show_sidebar})
 
