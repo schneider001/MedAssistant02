@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
+import os
+from datetime import datetime
 from .models import Patient, Request
 
 
@@ -105,7 +108,7 @@ def load_data_requests(request):
 
     return JsonResponse({'results': request_data, 'pagination': {'more': False}}) #Убрать more
 
-"""
+
 @login_required
 def load_patient_history(request):
 
@@ -123,12 +126,37 @@ def load_patient_history(request):
     requests = Request.get_requests_page_by_patient_id(patient_id, per_page)
 
     request_data = [{
-        'id': request.id,
-        'name': request.doctor.name,
-        'date': request.date.strftime("%Y-%m-%d %H:%M:%S"),
-        'diagnosis': request.predicted_disease.ru_name if request.predicted_disease else None,
-        'is_commented': 'Прокомментирован' if request.is_commented else 'Без комментариев'
+        'id': request['id'],
+        'name': request['doctor_name'],
+        'date': request['date'].strftime("%Y-%m-%d %H:%M:%S"),
+        'diagnosis': request['disease_ru_name'],
+        'is_commented': request['is_commented']
     } for request in requests]
 
     return JsonResponse({'results': request_data, 'pagination': {'more': False}}) #Убрать more
-"""
+
+
+@login_required
+def get_patient_info(request):
+    patient_id = request.GET.get('patient_id')
+
+    patient = get_object_or_404(Patient, id=patient_id)
+
+    today = datetime.now()
+    age = today.year - patient.born_date.year - \
+        ((today.month, today.day) < (patient.born_date.month, patient.born_date.day))
+
+    patient_data = {
+        'id': patient.id,
+        'name': patient.name,
+        'birthDate': patient.born_date.strftime("%Y-%m-%d"),
+        'age': age,
+        'oms': patient.insurance_certificate,
+        'sex': patient.sex,
+    }
+
+    photo_filename = f'static/patient_images/{patient_id}.jpg'
+    if os.path.exists(photo_filename):
+        patient_data['photo_url'] = photo_filename
+
+    return JsonResponse(patient_data)

@@ -27,9 +27,7 @@ $(document).ready(function() {
                 loadSection.style.display = 'none';
                 dataSection.style.display = 'block';
                 $('#name').text(data.name);
-                const dateObject = new Date(data.birthDate * 1000);
-                const formattedTime = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, '0')}-${dateObject.getDate().toString().padStart(2, '0')}`;
-                $('#birth-date').text(formattedTime);
+                $('#birth-date').text(data.birthDate);
                 $('#age').text(data.age);
                 $('#oms').text(data.oms);
                 $('#sex').text(function() {
