@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 import os
 from datetime import datetime
-from .models import Patient, Request
+from .models import Patient, Request, Symptom
 
 
 def login_view(request):
@@ -111,7 +111,12 @@ def load_data_requests(request):
 
 @login_required
 def load_patient_history(request):
-
+    """
+    Получает список запросов для пациента по id пациента для указанной странице в пагинации.
+    :param str patient_id: ID пациента.
+    :param str page: Номер страницы.
+    :return: JSON-ответ со списком запросов для указанной страницы, которые включают id запроса, имя доктора, предсказанный диагноз, информацию о комментариях докторов(Без комментариев/Прокомментирован).
+    """
     patient_id = request.GET.get('search', '')
     if not patient_id:
         return JsonResponse({}, status=400)
@@ -138,6 +143,11 @@ def load_patient_history(request):
 
 @login_required
 def get_patient_info(request):
+    """
+    Получает информацию о пациенте по его id.
+    :param str patient_id: ID пациента.
+    :return: JSON-ответ с информацией о пациенте, включая его id, полное имя, дату рождения, текущий возраст, Полис ОМС, пол.
+    """
     patient_id = request.GET.get('patient_id')
 
     patient = get_object_or_404(Patient, id=patient_id)
@@ -160,3 +170,33 @@ def get_patient_info(request):
         patient_data['photo_url'] = photo_filename
 
     return JsonResponse(patient_data)
+
+
+@login_required
+def load_symptoms(request):
+    """
+    :param str search: Фильтр.
+    :param str page: Номер страницы.
+    :return: JSON-ответ со списком симптомов для указанной страницы, включая id симптома, название, также переменную more, указывающая о конце пагинации.
+    """
+    search = request.GET.get('search', '').lower()
+    page = int(request.GET.get('page', 1))
+
+    per_page = 10
+
+    symptoms = Symptom.objects.all()
+    
+    if search != '':
+        symptoms = [row for row in symptoms if search in row.ru_name]
+    
+    start = (page - 1) * per_page
+    end = start + per_page
+    symptoms = symptoms[start:end]
+
+    request_data = [{
+        'id': symptom.id,
+        'name': symptom.ru_name,
+    } for symptom in symptoms]
+
+    return JsonResponse({'results': request_data, 'pagination': {'more': len(request_data) == per_page}})
+
