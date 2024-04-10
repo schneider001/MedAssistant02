@@ -1,3 +1,4 @@
 __pycache__/
 medassistant-venv/
-configs/db_settings.json
+configs/
+medassistant/app_medassistant/static/images/

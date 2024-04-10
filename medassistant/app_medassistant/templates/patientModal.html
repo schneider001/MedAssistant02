@@ -1,3 +1,4 @@
+{% load static %}
 <div class="modal fade" id="patientModal" tabindex="-1" data-modal-id="patient" aria-labelledby="patientModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
@@ -38,7 +39,7 @@
                 </div>
               </div>
               <div class="col-md-4 text-end">
-                <img src="/static/images/default-avatar.png" alt="Фотография пациента" class="patient-photo">
+                <img src="{% static 'images/patient_images/default-avatar.png' %}" alt="Фотография пациента" class="patient-photo">
               </div>
             </div>
             <h2 class="text-center mt-4">История запросов</h2>

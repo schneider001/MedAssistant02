@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 import os
 from datetime import datetime
 from .models import Patient, Request, Symptom
@@ -165,9 +166,47 @@ def get_patient_info(request):
         'sex': patient.sex,
     }
 
-    photo_filename = f'static/patient_images/{patient_id}.jpg'
-    if os.path.exists(photo_filename):
+    photo_filename = f'static/images/patient_images/{patient_id}.jpg' #Изменить путь для прода
+    if os.path.exists(os.path.join('app_medassistant', photo_filename)):
         patient_data['photo_url'] = photo_filename
+
+    return JsonResponse(patient_data)
+
+
+@login_required
+@csrf_exempt
+def create_patient(request):
+    """
+    Создает нового пациента.
+    :param str fullname: Имя пациента.
+    :param str birthdate: Дата рождения.
+    :param str oms: Полис ОМС пациента.
+    :param image image: Изображение пациента.
+    :return: JSON-ответ с информацией о пациенте, включая id пациента, имя пациента, Полис ОМС.
+    """
+    fullname = request.POST['fullname']
+    birthdate = request.POST['birthdate']
+    birthdate = datetime.strptime(birthdate, '%d.%m.%Y')
+    oms = request.POST['oms']
+    sex = request.POST['sex']
+    image = request.FILES.get('image')
+
+    patient = Patient.objects.create(name=fullname, insurance_certificate=oms, born_date=birthdate, sex=sex)
+    patient_data = {
+        'id': patient.id,
+        'name': patient.name,
+        'oms': patient.insurance_certificate
+    }
+
+    directory_path = 'app_medassistant/static/images/patient_images/' #Изменить путь для прода
+
+    if not os.path.exists(directory_path):
+        os.makedirs(directory_path)
+
+    if image:
+        with open(os.path.join(directory_path, f'{patient.id}.jpg'), 'wb+') as destination:
+            for chunk in image.chunks():
+                destination.write(chunk)
 
     return JsonResponse(patient_data)
 
