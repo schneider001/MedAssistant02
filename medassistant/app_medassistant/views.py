@@ -5,9 +5,11 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 import os
+import json
 from datetime import datetime
-from .models import Patient, Request, Symptom
+from .models import Patient, Request, Symptom, Disease
 
+ML_MODEL_VERSION = '1.0' #Вынести версию модели в конфиг
 
 def login_view(request):
     """
@@ -184,31 +186,32 @@ def create_patient(request):
     :param image image: Изображение пациента.
     :return: JSON-ответ с информацией о пациенте, включая id пациента, имя пациента, Полис ОМС.
     """
-    fullname = request.POST['fullname']
-    birthdate = request.POST['birthdate']
-    birthdate = datetime.strptime(birthdate, '%d.%m.%Y')
-    oms = request.POST['oms']
-    sex = request.POST['sex']
-    image = request.FILES.get('image')
+    if request.method == 'POST':
+        fullname = request.POST['fullname']
+        birthdate = request.POST['birthdate']
+        birthdate = datetime.strptime(birthdate, '%d.%m.%Y')
+        oms = request.POST['oms']
+        sex = request.POST['sex']
+        image = request.FILES.get('image')
 
-    patient = Patient.objects.create(name=fullname, insurance_certificate=oms, born_date=birthdate, sex=sex)
-    patient_data = {
-        'id': patient.id,
-        'name': patient.name,
-        'oms': patient.insurance_certificate
-    }
+        patient = Patient.objects.create(name=fullname, insurance_certificate=oms, born_date=birthdate, sex=sex)
+        patient_data = {
+            'id': patient.id,
+            'name': patient.name,
+            'oms': patient.insurance_certificate
+        }
 
-    directory_path = 'app_medassistant/static/images/patient_images/' #Изменить путь для прода
+        directory_path = 'app_medassistant/static/images/patient_images/' #Изменить путь для прода
 
-    if not os.path.exists(directory_path):
-        os.makedirs(directory_path)
+        if not os.path.exists(directory_path):
+            os.makedirs(directory_path)
 
-    if image:
-        with open(os.path.join(directory_path, f'{patient.id}.jpg'), 'wb+') as destination:
-            for chunk in image.chunks():
-                destination.write(chunk)
+        if image:
+            with open(os.path.join(directory_path, f'{patient.id}.jpg'), 'wb+') as destination:
+                for chunk in image.chunks():
+                    destination.write(chunk)
 
-    return JsonResponse(patient_data)
+        return JsonResponse(patient_data)
 
 
 @login_required
@@ -239,3 +242,48 @@ def load_symptoms(request):
 
     return JsonResponse({'results': request_data, 'pagination': {'more': len(request_data) == per_page}})
 
+
+@login_required
+@csrf_exempt
+def get_request_info(request):
+    """
+    Получает диагноз с помощью модели и возвращает информацию об этом запросе.
+    :param str id: ID пациента.
+    :param str name: Полное имя пациента.
+    :param str oms: Полис ОМС пациента.
+    :param list symptoms: Список симптомов.
+    :return: JSON-ответ с информацией для карточки запроса, включая id запроса, имя пациента, имя доктора, симптомы, предсказанный диагноз, комментарии врачей.
+    """
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+
+        patient_id = data.get('id')
+        patient_name = data.get('name')
+        symptom_ids = data.get('symptoms', [])
+
+        symptoms = [Symptom.objects.get(id=id) for id in symptom_ids]
+
+        request_id = Request.add(request.user.id, patient_id, [symptom.id for symptom in symptoms], ML_MODEL_VERSION)
+
+        disease_name = "Drug Reaction" # Забирать диагноз из ml модели
+
+        if disease_name:
+            status = 'READY'
+            disease = Disease.objects.get(name=disease_name)
+        else:
+            status = 'ERROR'
+
+        request_instance = Request.objects.get(id=request_id)
+        request_instance.update_status(status, disease.id)
+        doctor_comments = []
+
+        response_data = {
+            'id': request_id,
+            'patient_name': patient_name,
+            'doctor': request.user.doctor.name,
+            'symptoms': [symptom.ru_name for symptom in symptoms],
+            'diagnosis': disease.ru_name,
+            'doctor_comments': doctor_comments
+        }
+
+        return JsonResponse(response_data)

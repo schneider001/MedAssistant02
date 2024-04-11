@@ -46,11 +46,6 @@ class Patient(models.Model):
         ).order_by('-name')[:per_page]
 
     @classmethod
-    def get_id_by_insurance_certificate(cls, insurance_certificate):
-        patient = cls.objects.filter(insurance_certificate=insurance_certificate).first()
-        return patient.id if patient else None
-
-    @classmethod
     def get_name_by_request_id(cls, request_id):
         return cls.objects.filter(patient__request__id=request_id).values_list('name', flat=True).first()
 
@@ -123,6 +118,22 @@ class Request(models.Model):
         ).order_by(
             '-date', 'patient_name'
         )[:per_page]
+    
+    @classmethod
+    def add(cls, doctor_id, patient_id, symptom_ids, ml_model_version):
+        ml_model = MLModel.objects.get(version=ml_model_version)
+        request = cls.objects.create(doctor_id=doctor_id, patient_id=patient_id, ml_model=ml_model)
+
+        for symptom_id in symptom_ids:
+            symptom = Symptom.objects.get(id=symptom_id)
+            RequestSymptom.objects.create(request=request, symptom=symptom)
+
+        return request.id
+
+    def update_status(self, status, predicted_disease_id):
+        self.status = status
+        self.predicted_disease_id = predicted_disease_id
+        self.save()
     
 
 class RequestSymptom(models.Model):

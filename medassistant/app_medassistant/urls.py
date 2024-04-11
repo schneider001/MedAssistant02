@@ -14,4 +14,5 @@ urlpatterns = [
     path('load_patient_history', views.load_patient_history, name='load_patient_history'),
     path('create_patient', views.create_patient, name='create_patient'),
     path('load_symptoms', views.load_symptoms, name='load_symptoms'),
+    path('get_request_info', views.get_request_info, name='get_request_info'),
 ]

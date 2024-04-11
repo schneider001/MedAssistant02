@@ -14,8 +14,9 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'medassistant.settings')
 
 django.setup()
 
-from app_medassistant.models import Doctor, Patient, Request, Symptom, Disease, Comment, RequestSymptom
+from app_medassistant.models import Doctor, Patient, Request, Symptom, Disease, Comment, RequestSymptom, MLModel
 from django.contrib.auth.models import User
+from django.utils.encoding import force_bytes
 
 def fill_from_dataset(filepath, model_class):
     with open(filepath, 'r', encoding='utf-8') as csv_file:
@@ -87,6 +88,9 @@ def populate_database():
             timestamp = get_random_timestamp()
             status = 'NEW'
             Comment.objects.create(doctor_id=rand_arr[k], request_id=request.id, comment=get_random_string(25), date=timestamp, status=status)
+
+    # Создание записи о модели
+    MLModel.objects.create(hash=force_bytes('some_hash'), version="1.0") #Вынести версию модели в конфиг
 
 # Заполнение базы данных
 populate_database()
