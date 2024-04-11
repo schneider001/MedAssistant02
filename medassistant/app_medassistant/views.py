@@ -1,15 +1,14 @@
+import os
+import json
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-import os
-import json
 from datetime import datetime
 from .models import Patient, Request, Symptom, Disease, Comment
-
-ML_MODEL_VERSION = '1.0' #Вынести версию модели в конфиг
+from . import get_disease, ML_MODEL_VERSION
 
 def login_view(request):
     """
@@ -265,7 +264,7 @@ def get_request_info(request):
 
         request_id = Request.add(request.user.id, patient_id, [symptom.id for symptom in symptoms], ML_MODEL_VERSION)
 
-        disease_name = "Drug Reaction" # Забирать диагноз из ml модели
+        disease_name = get_disease([symptom.name for symptom in symptoms])
 
         if disease_name:
             status = 'READY'
