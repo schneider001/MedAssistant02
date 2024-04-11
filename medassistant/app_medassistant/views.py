@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 import os
 import json
 from datetime import datetime
-from .models import Patient, Request, Symptom, Disease
+from .models import Patient, Request, Symptom, Disease, Comment
 
 ML_MODEL_VERSION = '1.0' #Вынести версию модели в конфиг
 
@@ -286,4 +286,41 @@ def get_request_info(request):
             'doctor_comments': doctor_comments
         }
 
+        return JsonResponse(response_data)
+    
+
+@login_required
+@csrf_exempt
+def get_request_info_by_id(request):
+    """
+    Получает возвращает информацию о запросе по его id из БД.
+    :param str request_id: ID запроса.
+    :return: JSON-ответ с информацией для карточки запроса, включая id запроса имя пациента, имя доктора, симптомы, предсказанный диагноз, комментарии врачей.
+    """
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+
+        request_id = data.get('request_id')
+
+        symptoms = Request.get_symptom_ru_names(request_id)
+        diagnosis_ru_name = Request.objects.get(id=request_id).predicted_disease.ru_name
+        comments_values = Comment.get_comments_by_request_id(request_id, request.user.id)
+
+        doctor_comments = [{
+            'id': comment_values['comments_id'],
+            'doctor': comment_values['name'],
+            'time': comment_values['date'].strftime("%Y-%m-%d %H:%M:%S"),
+            'comment': comment_values['comment'],
+            'editable': comment_values['is_own_comment']
+        } for comment_values in comments_values]
+
+        response_data = {
+            'id': request_id,
+            'patient_name': Request.objects.get(id=request_id).patient.name,
+            'doctor': request.user.doctor.name, 
+            'symptoms': symptoms,
+            'diagnosis': diagnosis_ru_name,
+            'doctor_comments': doctor_comments
+        }
+        
         return JsonResponse(response_data)

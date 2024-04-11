@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.db.models import F
 
@@ -135,6 +135,10 @@ class Request(models.Model):
         self.predicted_disease_id = predicted_disease_id
         self.save()
     
+    def get_symptom_ru_names(request_id):
+        symptoms = Symptom.objects.filter(requestsymptom__request_id=request_id)
+        return list(symptoms.values_list('ru_name', flat=True))
+    
 
 class RequestSymptom(models.Model):
     symptom = models.ForeignKey(Symptom, on_delete=models.CASCADE)
@@ -156,3 +160,31 @@ class Comment(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     request = models.ForeignKey(Request, on_delete=models.CASCADE)
 
+    def get_comments_by_request_id(request_id, doctor_id):
+        comments = Comment.objects.filter(
+            request_id=request_id,
+            status=Comment.NEW
+        ).select_related('doctor').order_by('-id')
+
+        comments_list = []
+        for comment in comments:
+            is_own_comment = 1 if comment.doctor_id == doctor_id else 0
+            comments_list.append({
+                'comments_id': comment.id,
+                'name': comment.doctor.name,
+                'date': comment.date,
+                'comment': comment.comment,
+                'is_own_comment': is_own_comment
+            })
+
+        return comments_list
+
+
+@receiver(post_save, sender=Comment)
+def update_request_is_commented(sender, instance, created, **kwargs):
+    if created:
+        Request.objects.filter(id=instance.request_id).update(is_commented=True)
+
+@receiver(post_delete, sender=Comment)
+def update_request_is_commented_on_delete(sender, instance, **kwargs):
+    Request.objects.filter(id=instance.request_id).update(is_commented=Comment.objects.filter(request_id=instance.request_id, status=Comment.NEW).exists())

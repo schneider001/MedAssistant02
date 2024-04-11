@@ -70,8 +70,7 @@ def populate_database():
         predicted_disease_id = randint(1, 40)
         status = 'READY'
         date = get_random_timestamp()
-        is_commented = False
-        request = Request.objects.create(doctor_id=doctor_id, patient_id=patient_id, status=status, date=date, predicted_disease_id=predicted_disease_id, is_commented=is_commented)
+        request = Request.objects.create(doctor_id=doctor_id, patient_id=patient_id, status=status, date=date, predicted_disease_id=predicted_disease_id)
 
         # Создание симптомов для запроса
         used_symptoms = set()

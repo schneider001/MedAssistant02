@@ -15,4 +15,5 @@ urlpatterns = [
     path('create_patient', views.create_patient, name='create_patient'),
     path('load_symptoms', views.load_symptoms, name='load_symptoms'),
     path('get_request_info', views.get_request_info, name='get_request_info'),
+    path('get_request_info_by_id', views.get_request_info_by_id, name='get_request_info_by_id'),
 ]

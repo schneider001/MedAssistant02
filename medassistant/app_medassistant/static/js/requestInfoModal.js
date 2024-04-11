@@ -126,9 +126,7 @@ function createCommentBlock(id, doctor, comment, time, editable = false) {
     const $rowComment = $('<div>', { class: 'row g-3' });
     
     const $doctorName = $('<h6>', { class: 'col-8 text-primary fw-bold mb-0', text: doctor });
-    const dateObject = new Date(time * 1000);
-    const formattedTime = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, '0')}-${dateObject.getDate().toString().padStart(2, '0')} ${dateObject.getHours().toString().padStart(2, '0')}:${dateObject.getMinutes().toString().padStart(2, '0')}:${dateObject.getSeconds().toString().padStart(2, '0')}`;
-    const $timeElement = $('<p>', { class: 'col-4 mb-0 start', text: formattedTime });
+    const $timeElement = $('<p>', { class: 'col-4 mb-0 start', text: time });
     const $commentText = $('<span>', { class: 'text-dark', text: comment, style: 'font-weight: bold;' });
     
     $rowDoctorAndTime.append($doctorName, $timeElement);
