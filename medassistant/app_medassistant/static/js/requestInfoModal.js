@@ -1,45 +1,111 @@
 import { showError } from "./main.js";
 
 let requestId;
-let socket = io().connect(`http://'${document.domain}:${location.port}`);
+// let socket = io().connect(`http://'${document.domain}:${location.port}`);
+const webSocket = new WebSocket('ws://' + window.location.host + '/ws');
+
+console.log('host = ', window.location.host);
 
 window.addEventListener('beforeunload', function() {
-    socket.disconnect();
+    webSocket.close();
 });
 
-socket.on('connected', function() {
-    if (requestId !== undefined) {
-        openRequestInfoModal('by_id', { request_id: requestId });
-    }    
-});
+webSocket.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    switch(data.error) {
+        case 'connect_error':
+            showError('Произошла ошибка при подключении к серверу: ' + data.message);
+            break;
+        case 'disconnect_error':
+            showError('Произошла ошибка при отключении от сервера: ' + data.message);
+            break;
+        case 'join_room_error':
+            showError('Произошла ошибка при подключении к комнате: ' + data.message);
+            break;
+        case 'leave_room_error':
+            showError('Произошла ошибка при отключении от комнаты: ' + data.message);
+            break;
+        case 'add_comment_error':
+            showError('Произошла ошибка при создании комментария: ' + data.message);
+            break;
+        case 'edit_comment_error':
+            showError('Произошла ошибка при редактировании комментария: ' + data.message);
+            break;
+        case 'delete_comment_error':
+            showError('Произошла ошибка при удалении комментария: ' + data.message);
+            break;
+        case 'added_comment':
+            addCommentElement(data.comment);
+            break;
+        case 'self_added_comment':
+            data.comment.editable = true;
+            addCommentElement(data.comment);
+            break;
+        case 'edited_comment':
+            editCommentElement(data.comment);
+            break;
+        case 'self_edited_comment':
+            data.comment.editable = true;
+            editCommentElement(data.comment);
+            break;
+        case 'deleted_comment':
+            const elementToRemove = $(`#comment-${data.comment.id}`);
+            if (elementToRemove.length > 0) {
+                elementToRemove.remove();
+            }
+            const addCommentBlock = $('#add-comment');
+            if (!addCommentBlock.length && elementToRemove.hasClass("editable-comment")) {
+                createCommentInputBlock(data.comment.doctor);
+            }
+            break;
+        default:
+            console.log('Received message:', data);
+    }
+};
 
-socket.on('connect_error', function() {
-    showError('Произошла ошибка при подключении к серверу.');
-});
+webSocket.onerror = function() {
+    showError('Произошла ошибка при обмене данными с сервером.');
+};
 
-socket.on('disconnect_error', function() {
-    showError('Произошла ошибка при отключении от сервера.');
-});
+webSocket.onclose = function() {
+    showError('Соединение с сервером закрыто.');
+};
 
-socket.on('join_room_error', function() {
-    showError('Произошла ошибка при подключении к комнате.');
-});
 
-socket.on('leave_room_error', function() {
-    showError('Произошла ошибка при отключении от комнаты.');
-});
 
-socket.on('add_comment_error', function() {
-    showError('Произошла ошибка при создании комментария.');
-});
+// socket.on('connected', function() {
+//     if (requestId !== undefined) {
+//         openRequestInfoModal('by_id', { request_id: requestId });
+//     }    
+// });
 
-socket.on('edit_comment_error', function() {
-    showError('Произошла ошибка при редактировании комментария.');
-});
+// socket.on('connect_error', function() {
+//     showError('Произошла ошибка при подключении к серверу.');
+// });
 
-socket.on('delete_comment_error', function() {
-    ('Произошла ошибка при удалении комментария.');
-});
+// socket.on('disconnect_error', function() {
+//     showError('Произошла ошибка при отключении от сервера.');
+// });
+
+// socket.on('join_room_error', function() {
+//     showError('Произошла ошибка при подключении к комнате.');
+// });
+
+// socket.on('leave_room_error', function() {
+//     showError('Произошла ошибка при отключении от комнаты.');
+// });
+
+// socket.on('add_comment_error', function() {
+//     showError('Произошла ошибка при создании комментария.');
+// });
+
+// socket.on('edit_comment_error', function() {
+//     showError('Произошла ошибка при редактировании комментария.');
+// });
+
+// socket.on('delete_comment_error', function() {
+//     ('Произошла ошибка при удалении комментария.');
+// });
 
 export function openRequestInfoModal(mode, data) {
            
@@ -56,7 +122,8 @@ export function openRequestInfoModal(mode, data) {
         data: JSON.stringify(data),
         success: function(response) {
             requestId = response.id;
-            socket.emit('join_room', { room_id: response.id });
+            // socket.emit('join_room', { room_id: response.id });
+            webSocket.send(JSON.stringify({ action: 'join_room', room_id: response.id }));
             loadSection.style.display = 'none';
             dataSection.style.display = 'block';
             loadRequestInfoModal(response)
@@ -73,7 +140,8 @@ export function openRequestInfoModal(mode, data) {
 }
 
 $('#requestModal').on('hidden.bs.modal', function() {
-    socket.emit('leave_room', { room_id: requestId });
+    // socket.emit('leave_room', { room_id: requestId });
+    webSocket.send(JSON.stringify({ action: 'leave_room', room_id: requestId }));
     requestId = undefined;
 });
 
@@ -126,7 +194,9 @@ function createCommentBlock(id, doctor, comment, time, editable = false) {
     const $rowComment = $('<div>', { class: 'row g-3' });
     
     const $doctorName = $('<h6>', { class: 'col-8 text-primary fw-bold mb-0', text: doctor });
-    const $timeElement = $('<p>', { class: 'col-4 mb-0 start', text: time });
+    const dateObject = new Date(time * 1000);
+    const formattedTime = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, '0')}-${dateObject.getDate().toString().padStart(2, '0')} ${dateObject.getHours().toString().padStart(2, '0')}:${dateObject.getMinutes().toString().padStart(2, '0')}:${dateObject.getSeconds().toString().padStart(2, '0')}`;
+    const $timeElement = $('<p>', { class: 'col-4 mb-0 start', text: formattedTime });
     const $commentText = $('<span>', { class: 'text-dark', text: comment, style: 'font-weight: bold;' });
     
     $rowDoctorAndTime.append($doctorName, $timeElement);
@@ -261,7 +331,13 @@ function addComment() {
         commentInput.removeClass('is-invalid');
     }
     
-    socket.emit('add_comment', { request_id: requestId, comment: addedComment, room_id: requestId });
+    // socket.emit('add_comment', { request_id: requestId, comment: addedComment, room_id: requestId });
+    webSocket.send(JSON.stringify({
+        action: 'add_comment',
+        request_id: requestId,
+        comment: addedComment,
+        room_id: requestId
+    }));
 }
 
 function addCommentElement(comment) {
@@ -284,14 +360,14 @@ function addCommentElement(comment) {
     }
 }
 
-socket.on('added_comment', function(comment) {
-    addCommentElement(comment);
-});
+// socket.on('added_comment', function(comment) {
+//     addCommentElement(comment);
+// });
 
-socket.on('self_added_comment', function(comment) {
-    comment.editable = true;
-    addCommentElement(comment);
-});
+// socket.on('self_added_comment', function(comment) {
+//     comment.editable = true;
+//     addCommentElement(comment);
+// });
 
 function saveComment(id) {
     const commentInput = $('#comment-textarea');
@@ -304,7 +380,14 @@ function saveComment(id) {
         commentInput.removeClass('is-invalid');
     }
 
-    socket.emit('edit_comment', { room_id: requestId, request_id: requestId, comment_id: id, comment: updatedComment });
+    // socket.emit('edit_comment', { room_id: requestId, request_id: requestId, comment_id: id, comment: updatedComment });
+    webSocket.send(JSON.stringify({
+        action: 'edit_comment',
+        room_id: requestId,
+        request_id: requestId,
+        comment_id: id,
+        comment: updatedComment
+    }));
 }
 
 function editCommentElement(comment) {
@@ -332,30 +415,36 @@ function editCommentElement(comment) {
     }
 }
 
-socket.on('edited_comment', function(comment) {
-    editCommentElement(comment);
-});
+// socket.on('edited_comment', function(comment) {
+//     editCommentElement(comment);
+// });
   
-socket.on('self_edited_comment', function(comment) {
-    comment.editable = true;
-    editCommentElement(comment);
-});
+// socket.on('self_edited_comment', function(comment) {
+//     comment.editable = true;
+//     editCommentElement(comment);
+// });
 
 function deleteComment(id) {
-    socket.emit('delete_comment', { room_id: requestId, request_id: requestId, comment_id: id });
+    // socket.emit('delete_comment', { room_id: requestId, request_id: requestId, comment_id: id });
+    webSocket.send(JSON.stringify({
+        action: 'delete_comment',
+        room_id: requestId,
+        request_id: requestId,
+        comment_id: id
+    }));
 }
 
-socket.on('deleted_comment', function(comment) {
-    const elementToRemove = $(`#comment-${comment.id}`);
-    if (elementToRemove) {
-      elementToRemove.remove();
-    }
+// socket.on('deleted_comment', function(comment) {
+//     const elementToRemove = $(`#comment-${comment.id}`);
+//     if (elementToRemove) {
+//       elementToRemove.remove();
+//     }
     
-    const addCommentBlock = $('#add-comment');
-    if (!addCommentBlock.length && elementToRemove.hasClass("editable-comment")) {
-        createCommentInputBlock(comment.doctor);
-    }
-});
+//     const addCommentBlock = $('#add-comment');
+//     if (!addCommentBlock.length && elementToRemove.hasClass("editable-comment")) {
+//         createCommentInputBlock(comment.doctor);
+//     }
+// });
   
 function cancelEditComment(id, doctor, comment, time) {
     const commentBlock = $(`#comment-${id}`);
