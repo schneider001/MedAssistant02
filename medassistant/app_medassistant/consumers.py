@@ -24,16 +24,10 @@ class CommentConsumer(AsyncWebsocketConsumer):
         function_data = json.loads(text_data)
         function_data['type'] = function_data.pop('action')
 
-        if function_data['type'] in self.broadcast_functions:
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                function_data
-            )
-        else:
-            await self.channel_layer.send(
-                self.channel_name,
-                function_data
-            )
+        await self.channel_layer.send(
+            self.channel_name,
+            function_data
+        )
 
     async def join_room(self, event):
         print('join_room')
@@ -63,7 +57,6 @@ class CommentConsumer(AsyncWebsocketConsumer):
             request_id=event['request_id']
         )
 
-        # Подготовка данных комментария для отправки
         doctor = await database_sync_to_async(Doctor.objects.get)(id=self.user.id)
         comment_data = {
             'id': comment.id, 
@@ -72,11 +65,31 @@ class CommentConsumer(AsyncWebsocketConsumer):
             'comment': comment.comment
         }
 
-        # Отправка сообщения об добавленном комментарии
-        await self.send(text_data=json.dumps({
-            'type': 'self_added_comment',
-            'comment': comment_data
-        }))
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'sender_channel_name': self.channel_name,
+                'type': 'group_except_send',
+                'type_self': 'self_added_comment',
+                'type_other': 'added_comment',
+                'data_name': 'comment',
+                'data': comment_data
+            }
+        )
+
+        
+    async def group_except_send(self, event):
+        print('event =', event)
+        if self.channel_name == event['sender_channel_name']:
+            await self.send(text_data=json.dumps({
+                'type': event['type_self'],
+                event['data_name']: event['data']
+            }))
+        else:
+            await self.send(text_data=json.dumps({
+                'type': event['type_other'],
+                event['data_name']: event['data']
+            }))
 
     async def delete_comment(self, event):
         print('delete_comment')
