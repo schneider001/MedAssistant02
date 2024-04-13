@@ -178,13 +178,29 @@ class Comment(models.Model):
             })
 
         return comments_list
+    
+
+    def set_status(comment_id, new_status):
+        comment = Comment.objects.get(id=comment_id)
+        comment.status = new_status
+        comment.save()
+        return comment
+    
+
+    def set_comment(comment_id, new_comment):
+        old_comment = Comment.objects.get(id=comment_id)
+        old_comment.status = Comment.OLD
+        old_comment.save()
+        new_comment = Comment.objects.create(
+            comment=new_comment, 
+            doctor_id=old_comment.doctor.id, 
+            request_id=old_comment.request.id
+        )
+        return new_comment
 
 
 @receiver(post_save, sender=Comment)
 def update_request_is_commented(sender, instance, created, **kwargs):
     if created:
         Request.objects.filter(id=instance.request_id).update(is_commented=True)
-
-@receiver(post_delete, sender=Comment)
-def update_request_is_commented_on_delete(sender, instance, **kwargs):
     Request.objects.filter(id=instance.request_id).update(is_commented=Comment.objects.filter(request_id=instance.request_id, status=Comment.NEW).exists())
