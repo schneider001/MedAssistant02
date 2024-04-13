@@ -3,7 +3,6 @@ import { showError } from "./main.js";
 let requestId;
 const webSocket = new WebSocket('ws://' + window.location.host + '/ws');
 
-console.log('host = ', window.location.host);
 
 window.addEventListener('beforeunload', function() {
     webSocket.close();
@@ -11,10 +10,12 @@ window.addEventListener('beforeunload', function() {
 
 webSocket.onmessage = function(event) {
     const data = JSON.parse(event.data);
-    console.log(data)
     switch(data.type) {
         case 'connect_error':
             showError('Произошла ошибка при подключении к серверу: ' + data.message);
+            break;
+        case 'recieve_error':
+            showError('Произошла ошибка: ' + data.message);
             break;
         case 'disconnect_error':
             showError('Произошла ошибка при отключении от сервера: ' + data.message);
@@ -27,6 +28,9 @@ webSocket.onmessage = function(event) {
             break;
         case 'add_comment_error':
             showError('Произошла ошибка при создании комментария: ' + data.message);
+            break;
+        case 'group_except_send_error':
+            showError('Произошла ошибка: ' + data.message);
             break;
         case 'edit_comment_error':
             showError('Произошла ошибка при редактировании комментария: ' + data.message);
@@ -59,7 +63,7 @@ webSocket.onmessage = function(event) {
             }
             break;
         default:
-            console.log('Received message:', data);
+            console.log('Received unknown message:', data);
     }
 };
 
