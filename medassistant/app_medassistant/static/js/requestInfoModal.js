@@ -1,7 +1,6 @@
 import { showError } from "./main.js";
 
 let requestId;
-// let socket = io().connect(`http://'${document.domain}:${location.port}`);
 const webSocket = new WebSocket('ws://' + window.location.host + '/ws');
 
 console.log('host = ', window.location.host);
@@ -72,42 +71,6 @@ webSocket.onclose = function() {
     showError('Соединение с сервером закрыто.');
 };
 
-
-
-// socket.on('connected', function() {
-//     if (requestId !== undefined) {
-//         openRequestInfoModal('by_id', { request_id: requestId });
-//     }    
-// });
-
-// socket.on('connect_error', function() {
-//     showError('Произошла ошибка при подключении к серверу.');
-// });
-
-// socket.on('disconnect_error', function() {
-//     showError('Произошла ошибка при отключении от сервера.');
-// });
-
-// socket.on('join_room_error', function() {
-//     showError('Произошла ошибка при подключении к комнате.');
-// });
-
-// socket.on('leave_room_error', function() {
-//     showError('Произошла ошибка при отключении от комнаты.');
-// });
-
-// socket.on('add_comment_error', function() {
-//     showError('Произошла ошибка при создании комментария.');
-// });
-
-// socket.on('edit_comment_error', function() {
-//     showError('Произошла ошибка при редактировании комментария.');
-// });
-
-// socket.on('delete_comment_error', function() {
-//     ('Произошла ошибка при удалении комментария.');
-// });
-
 export function openRequestInfoModal(mode, data) {
            
     const loadSection = document.getElementById('request-load-section');
@@ -123,7 +86,6 @@ export function openRequestInfoModal(mode, data) {
         data: JSON.stringify(data),
         success: function(response) {
             requestId = response.id;
-            // socket.emit('join_room', { room_id: response.id });
             webSocket.send(JSON.stringify({ action: 'join_room', room_id: response.id }));
             loadSection.style.display = 'none';
             dataSection.style.display = 'block';
@@ -141,7 +103,6 @@ export function openRequestInfoModal(mode, data) {
 }
 
 $('#requestModal').on('hidden.bs.modal', function() {
-    // socket.emit('leave_room', { room_id: requestId });
     webSocket.send(JSON.stringify({ action: 'leave_room', room_id: requestId }));
     requestId = undefined;
 });
@@ -257,9 +218,7 @@ function editComment(id, doctor, comment, time) {
     
     const $header = $('<div>').addClass('d-flex justify-content-between align-items-center mb-3');
     const $title = $('<h6>').addClass('text-primary fw-bold mb-0').text(doctor);
-    const dateObject = new Date(time * 1000);
-    const formattedTime = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, '0')}-${dateObject.getDate().toString().padStart(2, '0')} ${dateObject.getHours().toString().padStart(2, '0')}:${dateObject.getMinutes().toString().padStart(2, '0')}:${dateObject.getSeconds().toString().padStart(2, '0')}`;
-    const $time = $('<p>').addClass('mb-0').text(formattedTime);
+    const $time = $('<p>').addClass('mb-0').text(time);
     
     const $textareaWrapper = $('<div>').addClass('mb-4 position-relative');
     const $textarea = $('<textarea>').attr('placeholder', 'Введите ваш комментарий здесь').attr('rows', 4).addClass('form-control').attr('id', 'comment-textarea').text(comment);
@@ -330,7 +289,6 @@ function addComment() {
         commentInput.removeClass('is-invalid');
     }
     
-    // socket.emit('add_comment', { request_id: requestId, comment: addedComment, room_id: requestId });
     webSocket.send(JSON.stringify({
         action: 'add_comment',
         request_id: requestId,
@@ -359,15 +317,6 @@ function addCommentElement(comment) {
     }
 }
 
-// socket.on('added_comment', function(comment) {
-//     addCommentElement(comment);
-// });
-
-// socket.on('self_added_comment', function(comment) {
-//     comment.editable = true;
-//     addCommentElement(comment);
-// });
-
 function saveComment(id) {
     const commentInput = $('#comment-textarea');
     const updatedComment = commentInput.val();
@@ -379,7 +328,6 @@ function saveComment(id) {
         commentInput.removeClass('is-invalid');
     }
 
-    // socket.emit('edit_comment', { room_id: requestId, request_id: requestId, comment_id: id, comment: updatedComment });
     webSocket.send(JSON.stringify({
         action: 'edit_comment',
         room_id: requestId,
@@ -414,17 +362,7 @@ function editCommentElement(comment) {
     }
 }
 
-// socket.on('edited_comment', function(comment) {
-//     editCommentElement(comment);
-// });
-  
-// socket.on('self_edited_comment', function(comment) {
-//     comment.editable = true;
-//     editCommentElement(comment);
-// });
-
 function deleteComment(id) {
-    // socket.emit('delete_comment', { room_id: requestId, request_id: requestId, comment_id: id });
     webSocket.send(JSON.stringify({
         action: 'delete_comment',
         room_id: requestId,
@@ -432,18 +370,6 @@ function deleteComment(id) {
         comment_id: id
     }));
 }
-
-// socket.on('deleted_comment', function(comment) {
-//     const elementToRemove = $(`#comment-${comment.id}`);
-//     if (elementToRemove) {
-//       elementToRemove.remove();
-//     }
-    
-//     const addCommentBlock = $('#add-comment');
-//     if (!addCommentBlock.length && elementToRemove.hasClass("editable-comment")) {
-//         createCommentInputBlock(comment.doctor);
-//     }
-// });
   
 function cancelEditComment(id, doctor, comment, time) {
     const commentBlock = $(`#comment-${id}`);

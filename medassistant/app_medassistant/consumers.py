@@ -8,16 +8,14 @@ from .models import Comment, Doctor
 class CommentConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
-        print('connect')
         self.user = self.scope['user']
         await self.accept()
 
     async def disconnect(self, close_code):
-        print('disconnect')
+        pass
         
 
     async def receive(self, text_data):
-        print('receive')
         # Получаем данные комментария
         function_data = json.loads(text_data)
         function_data['type'] = function_data.pop('action')
@@ -29,7 +27,6 @@ class CommentConsumer(AsyncWebsocketConsumer):
 
 
     async def join_room(self, event):
-        print('join_room')
         room_number = event['room_id']
         self.room_group_name = 'gorup_' + str(room_number)
         await self.channel_layer.group_add(
@@ -39,7 +36,6 @@ class CommentConsumer(AsyncWebsocketConsumer):
 
 
     async def leave_room(self, event):
-        print('leave_room')
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
@@ -47,7 +43,6 @@ class CommentConsumer(AsyncWebsocketConsumer):
     
 
     async def add_comment(self, event):
-        print('add_comment')
         comment = await database_sync_to_async(Comment.objects.create)(
             comment=event['comment'], 
             doctor_id=self.user.id, 
@@ -89,7 +84,6 @@ class CommentConsumer(AsyncWebsocketConsumer):
 
 
     async def delete_comment(self, event):
-        print('delete_comment')
         comment = await database_sync_to_async(Comment.set_status)(event['comment_id'], Comment.OLD)
         doctor = await database_sync_to_async(Doctor.objects.get)(id=self.user.id)
         comment_data = {
@@ -111,7 +105,6 @@ class CommentConsumer(AsyncWebsocketConsumer):
 
 
     async def edit_comment(self, event):
-        print('edit_comment')
 
         new_comment = await database_sync_to_async(Comment.set_comment)(event['comment_id'], event['comment'])
 
