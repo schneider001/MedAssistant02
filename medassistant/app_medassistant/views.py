@@ -175,7 +175,6 @@ def get_patient_info(request):
 
 
 @login_required
-@csrf_exempt
 def create_patient(request):
     """
     Создает нового пациента.
@@ -243,7 +242,6 @@ def load_symptoms(request):
 
 
 @login_required
-@csrf_exempt
 def get_request_info(request):
     """
     Получает диагноз с помощью модели и возвращает информацию об этом запросе.
@@ -289,7 +287,6 @@ def get_request_info(request):
     
 
 @login_required
-@csrf_exempt
 def get_request_info_by_id(request):
     """
     Получает возвращает информацию о запросе по его id из БД.

@@ -1,4 +1,7 @@
 import { showError } from "./main.js";
+import { setupCSRF } from "./csrf.js";
+
+setupCSRF();
 
 let requestId;
 const webSocket = new WebSocket('ws://' + window.location.host + '/ws');
