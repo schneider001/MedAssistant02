@@ -9,6 +9,9 @@ from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 from .models import Patient, Request, Symptom, Disease, Comment
 from . import get_disease, ML_MODEL_VERSION
+import logging
+
+logger = logging.getLogger('django')
 
 def login_view(request):
     """
@@ -21,8 +24,10 @@ def login_view(request):
 
         if user is not None and user.doctor is not None:
             login(request, user)
+            logger.info(f"User {username} logged in successfully.")
             return JsonResponse({'success': True})
         else:
+            logger.warning(f"Failed login attempt for {username}.")
             return JsonResponse({'success': False})
     else:
         return render(request, 'login.html')
@@ -33,7 +38,9 @@ def logout_view(request):
     """
     Обрабатывает выход пользователя.
     """
+    username = request.user.username
     logout(request)
+    logger.info(f"User {username} logged out.")
     return redirect('login')
 
 
@@ -42,8 +49,8 @@ def main(request):
     """
     Отображает главную страницу.
     """
-    show_sidebar = True
-    return render(request, 'index.html', {'show_sidebar': show_sidebar})
+    logger.info("Accessed the main page.")
+    return render(request, 'index.html', {'show_sidebar': True})
 
 
 @login_required
@@ -51,8 +58,8 @@ def patients(request):
     """
     Отображает страницу с пациентами.
     """
-    show_sidebar = True
-    return render(request, 'patients.html', {'show_sidebar': show_sidebar})
+    logger.info("Accessed the patients page.")
+    return render(request, 'patients.html', {'show_sidebar': True})
 
 
 @login_required
@@ -63,6 +70,7 @@ def load_patients(request):
     :return: JSON-ответ со списком пациентов для указанной страницы, включая id пациента, имя, полис ОМС; также переменную more, указывающая о конце пагинации.
     """
     search = request.GET.get('search', '')
+    logger.debug(f"Searching for patients with filter: {search}")
     per_page = 100
 
     if len(search) > 3:
@@ -71,7 +79,7 @@ def load_patients(request):
         patients = Patient.find_all(per_page)
 
     patients_data = [{'id': patient.id, 'name': patient.name, 'oms': patient.insurance_certificate} for patient in patients]
-    return JsonResponse({'results': patients_data, 'pagination': {'more': False}}) #Убрать more
+    return JsonResponse({'results': patients_data, 'pagination': {'more': False}})
 
 
 @login_required
@@ -79,8 +87,8 @@ def history(request):
     """
     Отображает страницу с историей запросов.
     """
-    show_sidebar = True
-    return render(request, 'history.html', {'show_sidebar': show_sidebar})
+    logger.info("Accessed the history page.")
+    return render(request, 'history.html', {'show_sidebar': True})
 
 
 @login_required
@@ -92,7 +100,7 @@ def load_data_requests(request):
     :return: JSON-ответ со списком запросов для указанной страницы, включая id запроса, имя пациента, дату, предсказанный диагноз, информацию о комментариях докторов(Без комментариев/Прокомментирован).
     """
     search = request.GET.get('search', '').lower()
-
+    logger.debug(f"Loading data requests with search filter: {search}")
     per_page = 100
 
     if len(search) > 3:
@@ -101,14 +109,14 @@ def load_data_requests(request):
         requests = Request.get_requests_page_by_doctor_id(request.user.id, per_page)
 
     request_data = [{
-        'id': request['id'],
-        'name': request['patient_name'],
-        'date': request['date'].strftime("%Y-%m-%d %H:%M:%S"),
-        'diagnosis': request['disease_name'],
-        'is_commented': request['is_commented']
-    } for request in requests]
+        'id': req['id'],
+        'name': req['patient_name'],
+        'date': req['date'].strftime("%Y-%m-%d %H:%M:%S"),
+        'diagnosis': req['disease_name'],
+        'is_commented': req['is_commented']
+    } for req in requests]
 
-    return JsonResponse({'results': request_data, 'pagination': {'more': False}}) #Убрать more
+    return JsonResponse({'results': request_data, 'pagination': {'more': False}})
 
 
 @login_required
@@ -120,27 +128,28 @@ def load_patient_history(request):
     :return: JSON-ответ со списком запросов для указанной страницы, которые включают id запроса, имя доктора, предсказанный диагноз, информацию о комментариях докторов(Без комментариев/Прокомментирован).
     """
     patient_id = request.GET.get('search', '')
+    logger.debug(f"Loading history for patient ID: {patient_id}")
     if not patient_id:
         return JsonResponse({}, status=400)
 
     try:
         patient_id = int(patient_id)
     except ValueError:
+        logger.error("Invalid patient ID format.")
         return JsonResponse({}, status=400)
 
     per_page = 100
-
     requests = Request.get_requests_page_by_patient_id(patient_id, per_page)
 
     request_data = [{
-        'id': request['id'],
-        'name': request['doctor_name'],
-        'date': request['date'].strftime("%Y-%m-%d %H:%M:%S"),
-        'diagnosis': request['disease_ru_name'],
-        'is_commented': request['is_commented']
-    } for request in requests]
+        'id': req['id'],
+        'name': req['doctor_name'],
+        'date': req['date'].strftime("%Y-%m-%d %H:%M:%S"),
+        'diagnosis': req['disease_ru_name'],
+        'is_commented': req['is_commented']
+    } for req in requests]
 
-    return JsonResponse({'results': request_data, 'pagination': {'more': False}}) #Убрать more
+    return JsonResponse({'results': request_data, 'pagination': {'more': False}})
 
 
 @login_required
@@ -151,12 +160,11 @@ def get_patient_info(request):
     :return: JSON-ответ с информацией о пациенте, включая его id, полное имя, дату рождения, текущий возраст, Полис ОМС, пол.
     """
     patient_id = request.GET.get('patient_id')
-
     patient = get_object_or_404(Patient, id=patient_id)
+    logger.info(f"Retrieved information for patient ID: {patient_id}")
 
     today = datetime.now()
-    age = today.year - patient.born_date.year - \
-        ((today.month, today.day) < (patient.born_date.month, patient.born_date.day))
+    age = today.year - patient.born_date.year - ((today.month, today.day) < (patient.born_date.month, patient.born_date.day))
 
     patient_data = {
         'id': patient.id,
@@ -186,21 +194,15 @@ def create_patient(request):
     """
     if request.method == 'POST':
         fullname = request.POST['fullname']
-        birthdate = request.POST['birthdate']
-        birthdate = datetime.strptime(birthdate, '%d.%m.%Y')
+        birthdate = datetime.strptime(request.POST['birthdate'], '%d.%m.%Y')
         oms = request.POST['oms']
         sex = request.POST['sex']
         image = request.FILES.get('image')
 
         patient = Patient.objects.create(name=fullname, insurance_certificate=oms, born_date=birthdate, sex=sex)
-        patient_data = {
-            'id': patient.id,
-            'name': patient.name,
-            'oms': patient.insurance_certificate
-        }
+        logger.info(f"Created new patient: {fullname}")
 
         directory_path = 'app_medassistant/static/images/patient_images/' #Изменить путь для прода
-
         if not os.path.exists(directory_path):
             os.makedirs(directory_path)
 
@@ -209,7 +211,11 @@ def create_patient(request):
                 for chunk in image.chunks():
                     destination.write(chunk)
 
-        return JsonResponse(patient_data)
+        return JsonResponse({
+            'id': patient.id,
+            'name': patient.name,
+            'oms': patient.insurance_certificate
+        })
 
 
 @login_required
@@ -221,24 +227,20 @@ def load_symptoms(request):
     """
     search = request.GET.get('search', '').lower()
     page = int(request.GET.get('page', 1))
+    logger.debug(f"Loading symptoms for page {page} with filter: {search}")
 
     per_page = 10
-
     symptoms = Symptom.objects.all()
-    
-    if search != '':
-        symptoms = [row for row in symptoms if search in row.ru_name]
-    
+    if search:
+        symptoms = [sym for sym in symptoms if search in sym.ru_name.lower()]
+
     start = (page - 1) * per_page
     end = start + per_page
     symptoms = symptoms[start:end]
 
-    request_data = [{
-        'id': symptom.id,
-        'name': symptom.ru_name,
-    } for symptom in symptoms]
+    symptom_data = [{'id': sym.id, 'name': sym.ru_name} for sym in symptoms]
 
-    return JsonResponse({'results': request_data, 'pagination': {'more': len(request_data) == per_page}})
+    return JsonResponse({'results': symptom_data, 'pagination': {'more': len(symptom_data) == per_page}})
 
 
 @login_required
@@ -258,33 +260,41 @@ def get_request_info(request):
         patient_name = data.get('name')
         symptom_ids = data.get('symptoms', [])
 
-        symptoms = [Symptom.objects.get(id=id) for id in symptom_ids]
+        try:
+            symptoms = [Symptom.objects.get(id=id) for id in symptom_ids]
+            logger.debug(f"Retrieved symptoms for patient {patient_name} with IDs: {symptom_ids}")
+        except Exception as e:
+            logger.error("Failed to retrieve symptoms", exc_info=True)
+            return JsonResponse({'error': 'Symptom data retrieval failed'}, status=400)
 
-        request_id = Request.add(request.user.id, patient_id, [symptom.id for symptom in symptoms], ML_MODEL_VERSION)
+        try:
+            request_id = Request.add(request.user.id, patient_id, [symptom.id for symptom in symptoms], ML_MODEL_VERSION)
+            disease_name = get_disease([symptom.name for symptom in symptoms])
 
-        disease_name = get_disease([symptom.name for symptom in symptoms])
+            if disease_name:
+                status = 'READY'
+                disease = Disease.objects.get(name=disease_name)
+            else:
+                status = 'ERROR'
+                disease = None
 
-        if disease_name:
-            status = 'READY'
-            disease = Disease.objects.get(name=disease_name)
-        else:
-            status = 'ERROR'
+            request_instance = Request.objects.get(id=request_id)
+            request_instance.update_status(status, disease.id if disease else None)
+            logger.info(f"Request {request_id} processed with status {status} for disease {disease_name}")
 
-        request_instance = Request.objects.get(id=request_id)
-        request_instance.update_status(status, disease.id)
-        doctor_comments = []
+            response_data = {
+                'id': request_id,
+                'patient_name': patient_name,
+                'doctor': request.user.doctor.name,
+                'symptoms': [symptom.ru_name for symptom in symptoms],
+                'diagnosis': disease.ru_name if disease else "Not diagnosed",
+                'doctor_comments': []
+            }
+            return JsonResponse(response_data)
+        except Exception as e:
+            logger.error("Failed to process medical request", exc_info=True)
+            return JsonResponse({'error': 'Failed to process request'}, status=500)
 
-        response_data = {
-            'id': request_id,
-            'patient_name': patient_name,
-            'doctor': request.user.doctor.name,
-            'symptoms': [symptom.ru_name for symptom in symptoms],
-            'diagnosis': disease.ru_name,
-            'doctor_comments': doctor_comments
-        }
-
-        return JsonResponse(response_data)
-    
 
 @login_required
 def get_request_info_by_id(request):
@@ -295,28 +305,32 @@ def get_request_info_by_id(request):
     """
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-
         request_id = data.get('request_id')
 
-        symptoms = Request.get_symptom_ru_names(request_id)
-        diagnosis_ru_name = Request.objects.get(id=request_id).predicted_disease.ru_name
-        comments_values = Comment.get_comments_by_request_id(request_id, request.user.id)
+        try:
+            request_details = Request.objects.get(id=request_id)
+            symptoms = Request.get_symptom_ru_names(request_id)
+            diagnosis_ru_name = request_details.predicted_disease.ru_name
+            comments_values = Comment.get_comments_by_request_id(request_id, request.user.id)
 
-        doctor_comments = [{
-            'id': comment_values['comments_id'],
-            'doctor': comment_values['name'],
-            'time': comment_values['date'].strftime("%Y-%m-%d %H:%M:%S"),
-            'comment': comment_values['comment'],
-            'editable': comment_values['is_own_comment']
-        } for comment_values in comments_values]
+            doctor_comments = [{
+                'id': comment_values['comments_id'],
+                'doctor': comment_values['name'],
+                'time': comment_values['date'].strftime("%Y-%m-%d %H:%M:%S"),
+                'comment': comment_values['comment'],
+                'editable': comment_values['is_own_comment']
+            } for comment_values in comments_values]
 
-        response_data = {
-            'id': request_id,
-            'patient_name': Request.objects.get(id=request_id).patient.name,
-            'doctor': request.user.doctor.name, 
-            'symptoms': symptoms,
-            'diagnosis': diagnosis_ru_name,
-            'doctor_comments': doctor_comments
-        }
-        
-        return JsonResponse(response_data)
+            response_data = {
+                'id': request_id,
+                'patient_name': request_details.patient.name,
+                'doctor': request.user.doctor.name,
+                'symptoms': symptoms,
+                'diagnosis': diagnosis_ru_name,
+                'doctor_comments': doctor_comments
+            }
+            logger.info(f"Retrieved request info for ID {request_id}")
+            return JsonResponse(response_data)
+        except Exception as e:
+            logger.error(f"Failed to retrieve request info for ID {request_id}", exc_info=True)
+            return JsonResponse({'error': 'Data retrieval failed'}, status=500)
