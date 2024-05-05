@@ -14,9 +14,6 @@ window.addEventListener('beforeunload', function() {
 webSocket.onmessage = function(event) {
     const data = JSON.parse(event.data);
     switch(data.type) {
-        case 'connect_error':
-            showError('Произошла ошибка при подключении к серверу: ' + data.message);
-            break;
         case 'recieve_error':
             showError('Произошла ошибка: ' + data.message);
             break;

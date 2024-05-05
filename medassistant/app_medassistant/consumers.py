@@ -17,7 +17,6 @@ class CommentConsumer(AsyncWebsocketConsumer):
             await self.accept()
             self.logger.info(f"User {self.user} connected successfully.")
         except Exception as e:
-            await self.send(text_data=json.dumps({'type': 'connect_error'}))
             self.logger.error("Connection failed:", exc_info=True)
 
     async def disconnect(self, close_code):
