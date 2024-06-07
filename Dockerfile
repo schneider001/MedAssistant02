@@ -1,30 +1,35 @@
-FROM python:3.10-slim-buster
+FROM debian:bookworm
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV USE_UNIX_SOCKET 1
 ENV USE_REDIS 1
 ENV DJANGO_SETTINGS_MODULE medassistant.settings
+ENV VIRTUAL_ENV=/MedAssistant02/medassistant-venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+ENV SERVICE_USER=www-data
+ENV SERVICE_GROUP=www-data
 
+ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y wget gnupg build-essential locales redis-server \
-    && echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
-    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-    && apt-get update && apt-get install -y postgresql-13 \
+RUN apt-get update && apt-get install -y python3 python3-pip wget gnupg build-essential locales redis-server postgresql python3-venv \
     && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN echo "local all postgres peer" >> /etc/postgresql/13/main/pg_hba.conf
+RUN python3 -m venv $VIRTUAL_ENV
+
+COPY ./requirements.txt /MedAssistant02/requirements.txt
+
+RUN . $VIRTUAL_ENV/bin/activate && \
+    pip install --upgrade pip && \
+    pip install -r /MedAssistant02/requirements.txt
 
 COPY . /MedAssistant02
 
 WORKDIR /MedAssistant02/medassistant
 
-RUN pip install --upgrade pip && \
-    pip install -r ../requirements.txt gunicorn uvicorn[standard] redis #move to requirements?
-
 EXPOSE 8000
 VOLUME /MedAssistant02/medassistant/app_medassistant/static/images
-VOLUME /var/lib/postgresql/data
+VOLUME /var/lib/postgresql
 
 ENTRYPOINT ["/MedAssistant02/entrypoint.sh"]

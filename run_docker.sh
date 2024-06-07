@@ -16,7 +16,7 @@ run_container() {
         docker stop $container_name
         docker rm $container_name
     fi
-    docker run --name $container_name -v pgdata:/var/lib/postgresql/data -v medassistant_images:/MedAssistant02/medassistant/app_medassistant/static/images -p 8000:8000 -d $image_name
+    docker run --name $container_name -v pgdata:/var/lib/postgresql -v medassistant_images:/MedAssistant02/medassistant/app_medassistant/static/images -p 8000:8000 -d $image_name
 }
 
 remove_container() {
