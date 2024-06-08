@@ -2,3 +2,4 @@ __pycache__/
 medassistant-venv/
 configs/
 medassistant/app_medassistant/static/images/
+*.log

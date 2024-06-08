@@ -1,5 +1,8 @@
 import "./select2adapters.js";
 import { showError } from "./main.js";
+import { setupCSRF } from "./csrf.js";
+
+setupCSRF();
 
 export function openCreatePatientModal() {
     $('#patientname').select2('close');
