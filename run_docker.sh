@@ -3,12 +3,13 @@
 image_name="medassist-img"
 container_name="medassist-cont"
 username="user"  
+PORT=8001
 
 docker volume create pgdata
 docker volume create medassistant_images
 
 build_image() {
-    docker build -t $image_name .
+    docker build --build-arg PORT=$PORT -t $image_name .
 }
 
 run_container() {
@@ -16,7 +17,7 @@ run_container() {
         docker stop $container_name
         docker rm $container_name
     fi
-    docker run --name $container_name -v pgdata:/var/lib/postgresql -v medassistant_images:/MedAssistant02/medassistant/app_medassistant/static/images -p 8000:8000 -d $image_name
+    docker run --name $container_name -v pgdata:/var/lib/postgresql -v medassistant_images:/MedAssistant02/medassistant/app_medassistant/static/images -p $PORT:$PORT -d $image_name
 }
 
 remove_container() {
@@ -68,12 +69,8 @@ done
 if [ $OPTIND -eq 1 ]; then
     build_image
     run_container
-    while ! nc -z localhost 8000; do   
-      sleep 0.1
-    done
-    if command -v firefox >/dev/null 2>&1; then
-        sudo -u $username firefox -new-instance -new-window 'http://127.0.0.1:8000'
-    else
-        echo "Firefox wasn't detected, please open http://127.0.0.1:8000 manually."
-    fi
+    while ! nc -z localhost $PORT; do   
+		sleep 0.1
+	done
+	echo "Service is started, please open http://127.0.0.1:$PORT in your browser."
 fi

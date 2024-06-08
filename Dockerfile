@@ -5,10 +5,11 @@ ENV PYTHONUNBUFFERED 1
 ENV USE_UNIX_SOCKET 1
 ENV USE_REDIS 1
 ENV DJANGO_SETTINGS_MODULE medassistant.settings
-ENV VIRTUAL_ENV=/MedAssistant02/medassistant-venv
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 ENV SERVICE_USER=www-data
 ENV SERVICE_GROUP=www-data
+
+ARG PORT=8000
+ENV PORT=$PORT
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -27,7 +28,7 @@ COPY . /MedAssistant02
 
 WORKDIR /MedAssistant02/medassistant
 
-EXPOSE 8000
+EXPOSE $PORT
 VOLUME /MedAssistant02/medassistant/app_medassistant/static/images
 VOLUME /var/lib/postgresql
 

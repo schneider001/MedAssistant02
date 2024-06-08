@@ -42,5 +42,5 @@ else
     echo "Database created and initialized."
 fi
 
-su -m $SERVICE_USER -c "gunicorn medassistant.asgi:application -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 --workers 3"
+su -m $SERVICE_USER -c "gunicorn medassistant.asgi:application -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT --workers 3"
 
