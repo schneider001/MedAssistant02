@@ -12,17 +12,16 @@ ENV SERVICE_GROUP=www-data
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y python3 python3-pip wget gnupg build-essential locales redis-server postgresql python3-venv \
+RUN apt-get update && apt-get install -y python3 python3-pip wget gnupg build-essential locales redis-server postgresql gunicorn python3-uvicorn \
     && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/* && mkdir /var/www && \
+    chown $SERVICE_USER:$SERVICE_GROUP /var/www && \
+    chsh -s /bin/bash $SERVICE_USER
 
-RUN python3 -m venv $VIRTUAL_ENV
 
 COPY ./requirements.txt /MedAssistant02/requirements.txt
 
-RUN . $VIRTUAL_ENV/bin/activate && \
-    pip install --upgrade pip && \
-    pip install -r /MedAssistant02/requirements.txt
+RUN python3 -m pip install -r /MedAssistant02/requirements.txt --break-system-packages
 
 COPY . /MedAssistant02
 

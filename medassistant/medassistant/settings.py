@@ -89,14 +89,16 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'medassistant',
-        'USER': 'postgres',
+        
     }
 }
 
 if os.getenv('USE_UNIX_SOCKET'):
+    DATABASES['default']['USER'] = 'www-data'
     DATABASES['default']['HOST'] = '/var/run/postgresql'  
     DATABASES['default']['PORT'] = ''  
 else:
+    DATABASES['default']['USER'] = 'postgres'
     DATABASES['default']['PASSWORD'] = 'postgres'
     DATABASES['default']['HOST'] = '127.0.0.1'
     DATABASES['default']['PORT'] = '5432'
