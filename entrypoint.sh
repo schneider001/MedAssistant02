@@ -22,12 +22,14 @@ if ! su - postgres -c "psql -tAc \"SELECT 1 FROM pg_roles WHERE rolname='$SERVIC
 fi
 
 chown $SERVICE_USER:$SERVICE_GROUP /var/lib/postgresql
-chown $SERVICE_USER:$SERVICE_GROUP /MedAssistant02/medassistant/app_medassistant/static/images
-
-
 
 service redis-server start
 echo "Redis service started."
+
+nginx -t
+chown -R $SERVICE_USER:$SERVICE_GROUP /var/www/ && chmod -R 0755 /var/www/
+service nginx start
+echo "Nginx service started."
 
 # Check if the database exists
 if su - $SERVICE_USER -c "psql -lqt | cut -d \| -f 1 | grep -qw medassistant"; then
@@ -42,5 +44,6 @@ else
     echo "Database created and initialized."
 fi
 
+su -m $SERVICE_USER -c "python3 /MedAssistant02/medassistant/manage.py collectstatic --noinput"
 su -m $SERVICE_USER -c "gunicorn medassistant.asgi:application -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT --workers 3"
 

@@ -1,9 +1,12 @@
 #!/bin/bash
 
+set -e
+
 image_name="medassist-img"
 container_name="medassist-cont"
 username="user"  
 PORT=8001
+NGINX_PORT=80
 
 docker volume create pgdata
 docker volume create medassistant_images
@@ -17,7 +20,7 @@ run_container() {
         docker stop $container_name
         docker rm $container_name
     fi
-    docker run --name $container_name -v pgdata:/var/lib/postgresql -v medassistant_images:/MedAssistant02/medassistant/app_medassistant/static/images -p $PORT:$PORT -d $image_name
+    docker run --name $container_name -v pgdata:/var/lib/postgresql -v medassistant_images:/var/www -p $PORT:$PORT -p $NGINX_PORT:$NGINX_PORT -d $image_name
 }
 
 remove_container() {

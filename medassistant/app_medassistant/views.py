@@ -6,7 +6,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
+from django.core.files.storage import default_storage
+from django.conf import settings
+from django.templatetags.static import static
 from datetime import datetime
+from urllib.parse import urlparse
 from .models import Patient, Request, Symptom, Disease, Comment
 from . import get_disease, ML_MODEL_VERSION
 import logging
@@ -174,10 +178,17 @@ def get_patient_info(request):
         'oms': patient.insurance_certificate,
         'sex': patient.sex,
     }
-
-    photo_filename = f'static/images/patient_images/{patient_id}.jpg' #Изменить путь для прода
-    if os.path.exists(os.path.join('app_medassistant', photo_filename)):
-        patient_data['photo_url'] = photo_filename
+    if settings.DEBUG:
+        photo_filename = f'static/images/patient_images/{patient_id}.jpg' #Изменить путь для прода
+        if os.path.exists(os.path.join('app_medassistant', photo_filename)):
+            patient_data['photo_url'] = photo_filename
+    else:
+        photo_filename = f'{patient_id}.jpg'
+        if default_storage.exists(photo_filename):
+            url = request.build_absolute_uri(os.path.join(settings.MEDIA_URL, photo_filename))
+            parts = urlparse(url)
+            url_without_port = parts._replace(netloc=parts.hostname).geturl()
+            patient_data['photo_url'] = url_without_port
 
     return JsonResponse(patient_data)
 
@@ -202,14 +213,19 @@ def create_patient(request):
         patient = Patient.objects.create(name=fullname, insurance_certificate=oms, born_date=birthdate, sex=sex)
         logger.info(f"Created new patient: {fullname}")
 
-        directory_path = 'app_medassistant/static/images/patient_images/' #Изменить путь для прода
-        if not os.path.exists(directory_path):
-            os.makedirs(directory_path)
+        if settings.DEBUG:
+            directory_path = 'app_medassistant/static/images/patient_images/' #Изменить путь для прода
+            if not os.path.exists(directory_path):
+                os.makedirs(directory_path)
 
-        if image:
-            with open(os.path.join(directory_path, f'{patient.id}.jpg'), 'wb+') as destination:
-                for chunk in image.chunks():
-                    destination.write(chunk)
+            if image:
+                with open(os.path.join(directory_path, f'{patient.id}.jpg'), 'wb+') as destination:
+                    for chunk in image.chunks():
+                        destination.write(chunk)
+        else:
+            if image:
+                file_name = f'{patient.id}.jpg'
+                file_name = default_storage.save(file_name, image)
 
         return JsonResponse({
             'id': patient.id,
