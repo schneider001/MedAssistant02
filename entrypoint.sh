@@ -31,6 +31,8 @@ chown -R $SERVICE_USER:$SERVICE_GROUP /var/www/ && chmod -R 0755 /var/www/
 service nginx start
 echo "Nginx service started."
 
+chown -R $SERVICE_USER:$SERVICE_GROUP /MedAssistant02
+
 # Check if the database exists
 if su - $SERVICE_USER -c "psql -lqt | cut -d \| -f 1 | grep -qw medassistant"; then
     # database exists
