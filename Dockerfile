@@ -15,7 +15,7 @@ ENV NGINX_PORT=$NGINX_PORT
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y python3 python3-pip wget gnupg build-essential locales redis-server postgresql gunicorn python3-uvicorn nginx \
+RUN apt-get update && apt-get install -y python3 python3-pip wget gnupg build-essential locales redis-server postgresql gunicorn python3-uvicorn nginx curl \
     && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen \
     && apt-get clean && rm -rf /var/lib/apt/lists/* && mkdir -p /var/www && \
     chown $SERVICE_USER:$SERVICE_GROUP /var/www && \
@@ -35,6 +35,9 @@ server {\
         autoindex on;\
         alias /var/www/;\
     }\
+	location /health {\
+		return 200 'OK';\
+	}\
     location / {\
         proxy_pass http://localhost:${PORT};\
         proxy_set_header Host \$host;\
@@ -52,4 +55,5 @@ EXPOSE $PORT
 VOLUME /var/www/
 VOLUME /var/lib/postgresql
 
+HEALTHCHECK --interval=15s --timeout=5s --retries=2 CMD ["sh", "-c", "pg_isready -h localhost -U $SERVICE_USER && redis-cli ping && nginx -t && curl -f http://localhost:$NGINX_PORT/health || exit 1"]
 ENTRYPOINT ["/MedAssistant02/entrypoint.sh"]

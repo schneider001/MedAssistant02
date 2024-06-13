@@ -72,8 +72,8 @@ done
 if [ $OPTIND -eq 1 ]; then
     build_image
     run_container
-    while ! nc -z localhost $PORT; do   
+    while ! docker container inspect --format '{{.State.Health.Status}}' $container_name | grep healthy > /dev/null; do   
 		sleep 0.1
 	done
-	echo "Service is started, please open http://127.0.0.1:$PORT in your browser."
+	echo "Service started, please open http://127.0.0.1:$PORT in your browser."
 fi
