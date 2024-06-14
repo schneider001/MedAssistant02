@@ -18,7 +18,6 @@ if ! su - postgres -c "psql -tAc \"SELECT 1 FROM pg_roles WHERE rolname='$SERVIC
     echo "Creating PostgreSQL user..."
     su - postgres -c "createuser -s $SERVICE_USER"
     echo "PostgreSQL user created."
-	echo "local   all             $SERVICE_USER                                peer" >> /etc/postgresql/*/main/pg_hba.conf
 fi
 
 chown $SERVICE_USER:$SERVICE_GROUP /var/lib/postgresql
