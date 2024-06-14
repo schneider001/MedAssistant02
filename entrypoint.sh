@@ -37,6 +37,7 @@ chown -R $SERVICE_USER:$SERVICE_GROUP /MedAssistant02
 if su - $SERVICE_USER -c "psql -lqt | cut -d \| -f 1 | grep -qw medassistant"; then
     # database exists
     echo "Database already exists, skipping initialization."
+	su -m $SERVICE_USER -c "python3 /MedAssistant02/medassistant/manage.py makemigrations && python3 /MedAssistant02/medassistant/manage.py migrate"
 else
     # database does not exist
     # create and initialize the database
