@@ -3,8 +3,7 @@
 set -e
 
 image_name="medassist-img"
-container_name="medassist-cont"
-username="user"  
+container_name="medassist-cont" 
 PORT=8001
 NGINX_PORT=80
 
@@ -16,7 +15,7 @@ build_image() {
 }
 
 run_container() {
-    if [ $(docker ps -a -f name=$container_name | grep -w $container_name > /dev/null; echo $?) = 0 ]; then
+    if [ "$(docker ps -a -f name=$container_name | grep -w $container_name > /dev/null; echo $?)" = 0 ]; then
         docker stop $container_name
         docker rm $container_name
     fi
@@ -24,7 +23,7 @@ run_container() {
 }
 
 remove_container() {
-    if [ $(docker inspect -f '{{.State.Running}}' $container_name) = "true" ]; then
+    if [ "$(docker inspect -f '{{.State.Running}}' $container_name)" = "true" ]; then
         docker stop $container_name
     fi
     docker rm $container_name
