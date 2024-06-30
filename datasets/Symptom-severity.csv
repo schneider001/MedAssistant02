@@ -44,7 +44,7 @@ mild_fever,5
 yellow_urine,4
 yellowing_of_eyes,4
 acute_liver_failure,6
-fluid_overload,6
+fluid_overload,5
 swelling_of_stomach,7
 swelled_lymph_nodes,6
 malaise,6
@@ -89,7 +89,7 @@ unsteadiness,4
 weakness_of_one_body_side,4
 loss_of_smell,3
 bladder_discomfort,4
-foul_smell_ofurine,5
+foul_smell_of_urine,5
 continuous_feel_of_urine,6
 passage_of_gases,5
 internal_itching,4
@@ -116,7 +116,6 @@ coma,7
 stomach_bleeding,6
 distention_of_abdomen,4
 history_of_alcohol_consumption,5
-fluid_overload,4
 blood_in_sputum,5
 prominent_veins_on_calf,6
 palpitations,4
